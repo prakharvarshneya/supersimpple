@@ -1,0 +1,2411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vector — JEE Physics Atlas · Simulation Library</title>
+<style>
+:root{
+  --bg:#050b18; --bg2:#0a1731; --panel:#0f1c3d; --panel2:#13254f; --line:#263a68;
+  --text:#eaf1ff; --muted:#9aaccc; --cyan:#45e6d4; --blue:#7898ff; --orange:#ffb162; --green:#9eff90;
+  --shadow:0 18px 55px rgba(0,0,0,.35); --radius:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:
+  radial-gradient(circle at 18% 8%,rgba(95,131,255,.28),transparent 22%),
+  radial-gradient(circle at 82% 4%,rgba(69,230,212,.16),transparent 22%),
+  linear-gradient(180deg,#06101f 0%,#040814 100%);
+  color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1540px;margin:0 auto;padding:18px 24px 48px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;
+  border:1px solid rgba(91,122,188,.18);border-radius:999px;padding:10px 14px 10px 18px;
+  background:rgba(9,15,29,.64);backdrop-filter:blur(14px);box-shadow:var(--shadow);}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));color:#071022;font-weight:900;
+  box-shadow:0 10px 28px rgba(120,152,255,.25)}
+.brand h1{font-size:16px;margin:0;letter-spacing:.08em;text-transform:uppercase}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navchips{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.navchip{border:1px solid rgba(130,155,214,.18);background:rgba(13,21,44,.88);color:var(--muted);
+  padding:8px 12px;border-radius:999px;font-size:12px}
+.navchip b{color:var(--cyan)}
+
+.hero{padding:30px 6px 6px}
+.eyebrow{font:700 11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:var(--cyan)}
+h2.hero-title{font-size:clamp(32px,4.4vw,58px);line-height:.95;margin:10px 0 10px;letter-spacing:-.05em;max-width:14ch}
+.hero-copy{max-width:720px;color:var(--muted);font-size:16px;line-height:1.6;margin:0}
+
+.toolbar{margin:24px 0 6px;display:flex;flex-direction:column;gap:12px}
+.search-row{position:relative;max-width:420px}
+.search-row input{width:100%;border:1px solid rgba(130,155,214,.22);background:rgba(13,21,44,.88);
+  color:var(--text);border-radius:999px;padding:12px 16px 12px 40px;outline:none;}
+.search-row input::placeholder{color:var(--muted)}
+.search-row svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);opacity:.55}
+
+.chapter-bar{display:flex;gap:10px;flex-wrap:wrap}
+.chapter-btn{border:1px solid rgba(130,155,214,.18);background:rgba(15,28,61,.92);color:#b5c3e6;
+  border-radius:999px;padding:11px 16px;font-size:13px;font-weight:700;transition:.18s ease;}
+.chapter-btn.active{background:linear-gradient(135deg,#6f8dff,#83ecdb);color:#06101c;border-color:transparent;box-shadow:0 12px 30px rgba(126,154,255,.24)}
+.chapter-btn:hover{transform:translateY(-1px)}
+
+.section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin:26px 2px 14px}
+.section-head h4{margin:0;font-size:18px;letter-spacing:-.03em}
+.section-head .meta{color:var(--muted);font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.chapter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.chapter-card{padding:16px;border-radius:16px;border:1px solid rgba(130,155,214,.14);background:#0f1934;min-height:118px;
+  display:flex;flex-direction:column;gap:9px;transition:.2s ease}
+.chapter-card.live{cursor:pointer}
+.chapter-card.live:hover{border-color:rgba(120,152,255,.85);background:#142449;transform:translateY(-2px)}
+.chapter-card.soon{opacity:.68}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.chapter-card .unit-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.chapter-card strong{font-size:15px;line-height:1.35}
+.chapter-card .chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.pill{padding:5px 8px;border-radius:999px;font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em}
+.pill.live{background:rgba(69,230,212,.12);color:var(--cyan)}
+.pill.soon{background:rgba(255,177,98,.12);color:var(--orange)}
+.concept-chip{border:1px solid rgba(130,155,214,.16);background:#0d1731;color:#bfd0ef;border-radius:999px;
+  padding:5px 9px;font-size:11px;}
+.card-bottom{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11.5px}
+.chapter-card.live .card-bottom{color:var(--cyan)}
+.empty-state{padding:60px 0;text-align:center;color:var(--muted);font-size:13px}
+
+/* ---- Lab view ---- */
+#labView{display:none}
+.back-btn{border:1px solid rgba(130,155,214,.2);background:rgba(15,26,54,.75);color:#cfe0ff;
+  border-radius:999px;padding:9px 14px;font-size:12.5px;font-weight:700;margin:22px 0 16px;display:inline-flex;align-items:center;gap:6px}
+.back-btn:hover{border-color:rgba(120,152,255,.7)}
+.lab-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.85fr);gap:16px;align-items:start}
+@media (max-width:1024px){.lab-layout{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,rgba(17,29,64,.95),rgba(10,18,40,.92));
+  border:1px solid rgba(117,144,205,.18);border-radius:var(--radius);box-shadow:var(--shadow)}
+.lab-canvas-wrap{padding:20px}
+.lab-canvas-wrap h3{margin:0 0 4px;font-size:21px;letter-spacing:-.03em}
+.lab-canvas-wrap .subline{color:var(--muted);font-size:13px;margin:0 0 14px;max-width:60ch;line-height:1.5}
+canvas#scene{display:block;width:100%;height:auto;border-radius:14px;background:#081226;border:1px solid rgba(130,155,214,.14)}
+.warning-banner{margin-top:12px;padding:10px 13px;border-radius:12px;background:rgba(255,177,98,.1);
+  border:1px solid rgba(255,177,98,.25);color:#ffd9ae;font-size:12.5px;line-height:1.5;display:none}
+.warning-banner.show{display:block}
+.side{display:flex;flex-direction:column;gap:16px}
+.card{padding:18px 20px}
+.card h4{margin:0 0 14px;font-size:15.5px;letter-spacing:-.02em}
+.control{margin-bottom:16px}
+.control label{display:flex;justify-content:space-between;gap:10px;color:#c5d2ea;font-size:13px;margin-bottom:8px}
+.control output{color:var(--cyan);font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace}
+.control-row{display:flex;align-items:center;gap:8px}
+.control-row input[type=range]{flex:1;min-width:0}
+.control-row input[type=number]{
+  width:64px;flex-shrink:0;background:#0d1731;border:1px solid rgba(130,155,214,.25);
+  border-radius:8px;color:var(--cyan);font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding:5px 6px;text-align:right;outline:none;
+}
+.control-row input[type=number]:focus{border-color:var(--cyan)}
+.control-row .ctl-suffix{color:var(--muted);font-size:11px;flex-shrink:0;width:22px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.readout{display:flex;flex-direction:column;gap:9px}
+.readout .row{display:flex;justify-content:space-between;font-size:13px;color:#c5d2ea;gap:10px}
+.readout .row b{color:var(--cyan);font:700 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right}
+.readout .row b.bad{color:#ff9fa3}
+.readout .row b.good{color:var(--green)}
+.steps{font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cfe0ff;white-space:pre-wrap;
+  background:rgba(12,22,46,.65);border:1px solid rgba(130,155,214,.16);border-radius:12px;padding:12px 14px;margin-top:2px}
+.mini-row{display:flex;gap:9px;flex-wrap:wrap}
+.mini-btn{border:1px solid rgba(130,155,214,.18);background:#142248;color:#dce8ff;border-radius:12px;
+  padding:9px 12px;font-size:12.5px;font-weight:700;transition:.15s ease}
+.mini-btn:hover{border-color:rgba(120,152,255,.5);background:#1a2b5a}
+.mini-btn.primary{background:linear-gradient(135deg,#6f8dff,#57e1d0);color:#05111c;border-color:transparent}
+.mini-btn.primary:hover{opacity:.92;box-shadow:0 4px 18px rgba(111,141,255,.35)}
+.mini-btn.active{background:rgba(69,230,212,.15);border-color:var(--cyan);color:var(--cyan)}
+.mini-btn.danger{border-color:rgba(255,122,127,.4);color:#ffb3b6;background:none}
+
+/* Playback bar for animated scenes */
+.playback-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;
+  padding:10px 14px;background:#0d1836;border:1px solid rgba(130,155,214,.18);border-radius:14px}
+.playback-btns{display:flex;align-items:center;gap:8px}
+.play-toggle-btn{padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid transparent;
+  background:linear-gradient(135deg,#45e6d4,#7898ff);color:#05101f;display:inline-flex;align-items:center;gap:6px}
+.play-toggle-btn.paused{background:#172856;color:#cfe0ff;border-color:rgba(130,155,214,.3)}
+.sim-time-badge{font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}
+
+.bench-palette{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.bench-chip{border:1px dashed rgba(130,155,214,.45);background:rgba(15,26,54,.75);color:#cfe0ff;
+  border-radius:999px;padding:8px 11px;font-size:11.5px;font-weight:700}
+.bench-chip.active{border-color:var(--cyan);color:var(--cyan);background:rgba(69,230,212,.1)}
+.bench-elements{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.bench-el-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;
+  border:1px solid rgba(130,155,214,.16);border-radius:10px;background:#0d1731;font-size:12px}
+.bench-el-row.selected{border-color:var(--cyan)}
+.bench-el-row button{border:1px solid rgba(255,122,127,.35);background:none;color:#ffb3b6;border-radius:7px;
+  padding:4px 8px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===================== CATALOG VIEW ===================== -->
+  <div id="catalogView">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">V</div>
+        <div>
+          <h1>Vector Physics Atlas</h1>
+          <p>JEE Main + Advanced — simulation library</p>
+        </div>
+      </div>
+      <div class="navchips">
+        <div class="navchip"><b id="liveCount">0</b>&nbsp;scenes live</div>
+        <div class="navchip">21 chapters</div>
+        <div class="navchip">Scan a question →</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">JEE MAIN + ADVANCED · SIMULATION LIBRARY</div>
+      <h2 class="hero-title">Every chapter, one atlas.</h2>
+      <p class="hero-copy">
+        Browse the full JEE Physics syllabus as interactive scenes. Filter by unit, search a subtopic,
+        or open a live simulation directly — everything else is mapped out and on the way.
+      </p>
+      <div class="toolbar">
+        <div class="search-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="searchInput" type="text" placeholder="Search subtopics or chapters…">
+        </div>
+        <div class="chapter-bar" id="unitBar"></div>
+      </div>
+    </section>
+
+    <section class="section-head">
+      <h4>Subtopics</h4>
+      <div class="meta"><span id="resultCount">0</span> shown</div>
+    </section>
+    <div class="chapter-grid" id="grid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">No subtopics match your search.</div>
+  </div>
+
+  <!-- ===================== LAB VIEW ===================== -->
+  <div id="labView">
+    <button class="back-btn" id="backBtn">← Back to catalog</button>
+    <div class="lab-layout">
+      <div class="panel lab-canvas-wrap">
+        <h3 id="labTitle">Scene</h3>
+        <p class="subline" id="labSubline">Description</p>
+        <canvas id="scene" width="880" height="420"></canvas>
+        <div class="warning-banner" id="labWarning"></div>
+
+        <!-- playback bar for animated scenes -->
+        <div class="playback-bar" id="playbackBar" style="display:none">
+          <div class="playback-btns">
+            <button class="play-toggle-btn" id="playToggleBtn">❚❚ Pause</button>
+            <button class="mini-btn" id="resetAnimBtn">↺ Reset positions</button>
+            <button class="mini-btn" id="reverseVelBtn">⇄ Reverse velocities</button>
+          </div>
+          <div class="sim-time-badge" id="simTimeBadge">LIVE ANIMATION · 1.0×</div>
+        </div>
+
+        <!-- bench-only controls -->
+        <div id="benchPaletteWrap" style="display:none;margin-top:14px">
+          <div class="bench-palette" id="benchPalette"></div>
+          <div class="mini-row">
+            <button class="mini-btn" id="benchClearBtn">Clear bench</button>
+            <button class="mini-btn primary" id="benchExampleBtn">Load example</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="panel card">
+          <h4>Controls</h4>
+          <div id="controlPanel"></div>
+        </div>
+        <div class="panel card">
+          <h4>Readout</h4>
+          <div class="readout" id="readoutPanel"></div>
+        </div>
+        <div class="panel card" id="stepsCard" style="display:none">
+          <h4>Step-by-step</h4>
+          <div class="steps" id="stepsPanel"></div>
+        </div>
+        <div class="panel card" id="benchEditorCard" style="display:none">
+          <h4>Selected element</h4>
+          <div id="benchEditor"></div>
+        </div>
+        <div class="panel card" id="benchListCard" style="display:none">
+          <h4>Elements on bench</h4>
+          <p style="margin:0 0 10px;color:var(--muted);font-size:11.5px">Drag an element on the canvas to move it, or click it to edit.</p>
+          <div class="bench-elements" id="benchElements"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================================
+   1. GEOMETRY / OPTICS MATH HELPERS
+   ========================================================================= */
+const D2R = Math.PI/180, R2D = 180/Math.PI;
+function deg2rad(d){return d*D2R;}
+function rad2deg(r){return r*R2D;}
+function vnorm(v){ const m = Math.hypot(v.x,v.y) || 1; return {x:v.x/m, y:v.y/m}; }
+function vdot(a,b){ return a.x*b.x + a.y*b.y; }
+function vsub(a,b){ return {x:a.x-b.x, y:a.y-b.y}; }
+function vadd(a,b){ return {x:a.x+b.x, y:a.y+b.y}; }
+function vscale(a,s){ return {x:a.x*s, y:a.y*s}; }
+function rotate(v, deg){
+  const r = deg2rad(deg);
+  return { x: v.x*Math.cos(r) - v.y*Math.sin(r), y: v.x*Math.sin(r) + v.y*Math.cos(r) };
+}
+function vectorRefract(d, n, eta){
+  d = vnorm(d); n = vnorm(n);
+  let cosi = -vdot(n,d);
+  let nn = n;
+  if (cosi < 0){ cosi = -cosi; nn = {x:-n.x, y:-n.y}; }
+  const k = 1 - eta*eta*(1 - cosi*cosi);
+  if (k < 0) return null;
+  const cost = Math.sqrt(k);
+  return vnorm({ x: eta*d.x + (eta*cosi - cost)*nn.x, y: eta*d.y + (eta*cosi - cost)*nn.y });
+}
+function vectorReflect(d, n){
+  d = vnorm(d); n = vnorm(n);
+  const dn = vdot(d,n);
+  return vnorm({ x: d.x - 2*dn*n.x, y: d.y - 2*dn*n.y });
+}
+function rayLineIntersect(o, d, p1, p2){
+  const seg = vsub(p2,p1);
+  const denom = d.x*seg.y - d.y*seg.x;
+  if (Math.abs(denom) < 1e-9) return null;
+  const diff = vsub(p1,o);
+  const t = (diff.x*seg.y - diff.y*seg.x) / denom;
+  return t;
+}
+function fmt(n, digits){
+  if (!isFinite(n)) return "∞";
+  if (Math.abs(n) > 9999) return (n>0?"+":"") + n.toExponential(2);
+  return (n>0 && digits!==0 ? "+" : "") + n.toFixed(digits===undefined?2:digits);
+}
+
+/* =========================================================================
+   2. CANVAS DRAW HELPERS  (logical canvas is 880 x 420, axis at y=210)
+   ========================================================================= */
+const CW = 880, CH = 420, AXIS_Y = 210;
+let ctx;
+
+function clear(){
+  ctx.clearRect(0,0,CW,CH);
+}
+function drawAxis(originXpx){
+  ctx.strokeStyle = "rgba(154,172,204,.35)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,AXIS_Y); ctx.lineTo(CW,AXIS_Y); ctx.stroke();
+  ctx.strokeStyle = "rgba(154,172,204,.5)";
+  ctx.beginPath(); ctx.moveTo(originXpx,AXIS_Y-6); ctx.lineTo(originXpx,AXIS_Y+6); ctx.stroke();
+}
+function seg(x1,y1,x2,y2,color,width,dash){
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = width||2;
+  if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.restore();
+}
+function dot(x,y,color,r){
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(x,y,r||3,0,Math.PI*2); ctx.fill();
+}
+function label(text,x,y,color,align,size){
+  ctx.fillStyle = color || "#cfe0ff";
+  ctx.font = (size||12)+"px ui-monospace,SFMono-Regular,Menlo,monospace";
+  ctx.textAlign = align || "left";
+  ctx.fillText(text,x,y);
+}
+function arrowMark(xPix, tipY, color, dashed, text){
+  seg(xPix, AXIS_Y, xPix, tipY, color, 2.4, dashed ? [6,5] : null);
+  const dir = tipY < AXIS_Y ? -1 : 1;
+  ctx.save();
+  ctx.fillStyle = color; ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(xPix, tipY);
+  ctx.lineTo(xPix-6, tipY-dir*10);
+  ctx.lineTo(xPix+6, tipY-dir*10);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if (text) label(text, xPix, tipY < AXIS_Y ? tipY-14 : tipY+22, color, "center", 11);
+}
+function clampAbs(v, maxAbs){
+  if (!isFinite(v)) return v>0?maxAbs:-maxAbs;
+  return Math.max(-maxAbs, Math.min(maxAbs, v));
+}
+function rayArrow(x1,y1,x2,y2,color,width,dash){
+  seg(x1,y1,x2,y2,color,width,dash);
+  const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.hypot(dx,dy) || 1;
+  const ux = dx/len, uy = dy/len;
+  const size = 6;
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(mx+ux*size, my+uy*size);
+  ctx.lineTo(mx-uy*size*0.6-ux*size*0.4, my+ux*size*0.6-uy*size*0.4);
+  ctx.lineTo(mx+uy*size*0.6-ux*size*0.4, my-ux*size*0.6-uy*size*0.4);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function fitScale(leftCm, rightCm, leftPx, rightPx){
+  const s = Math.min(leftPx/Math.max(leftCm,1e-6), rightPx/Math.max(rightCm,1e-6));
+  return Math.max(0.25, Math.min(10, s));
+}
+function drawTicks(originXpx, scale){
+  ctx.save();
+  ctx.strokeStyle = "rgba(154,172,204,.18)";
+  ctx.font = "9px ui-monospace,SFMono-Regular,Menlo,monospace";
+  ctx.fillStyle = "rgba(154,172,204,.4)";
+  ctx.textAlign = "center";
+  const step = scale >= 3 ? 10 : scale >= 1 ? 20 : scale >= 0.5 ? 50 : 100;
+  const range = Math.ceil((CW/2)/(scale*step))*step + step;
+  for (let cm = -range; cm <= range; cm += step){
+    if (cm === 0) continue;
+    const x = originXpx + cm*scale;
+    if (x < 0 || x > CW) continue;
+    ctx.beginPath(); ctx.moveTo(x, AXIS_Y-4); ctx.lineTo(x, AXIS_Y+4); ctx.stroke();
+    ctx.fillText(cm, x, AXIS_Y+16);
+  }
+  ctx.restore();
+}
+function drawTicksFrom(originXpx, scale){
+  ctx.save();
+  ctx.strokeStyle = "rgba(154,172,204,.18)";
+  ctx.font = "9px ui-monospace,SFMono-Regular,Menlo,monospace";
+  ctx.fillStyle = "rgba(154,172,204,.4)";
+  ctx.textAlign = "center";
+  for (let cm = 0; cm <= BENCH_LENGTH; cm += 10){
+    const x = originXpx + cm*scale;
+    if (x > CW) continue;
+    ctx.beginPath(); ctx.moveTo(x, AXIS_Y-4); ctx.lineTo(x, AXIS_Y+4); ctx.stroke();
+    ctx.fillText(cm, x, AXIS_Y+16);
+  }
+  ctx.restore();
+}
+function drawAngleArc(center, dirA, dirB, radius, color, text){
+  const a = Math.atan2(dirA.y, dirA.x), b = Math.atan2(dirB.y, dirB.x);
+  let diff = b - a;
+  while (diff > Math.PI) diff -= 2*Math.PI;
+  while (diff < -Math.PI) diff += 2*Math.PI;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, radius, a, a+diff, diff<0);
+  ctx.stroke();
+  ctx.restore();
+  const mid = a + diff/2;
+  label(text, center.x+Math.cos(mid)*(radius+15), center.y+Math.sin(mid)*(radius+15), color, "center", 11);
+}
+function tracePrismPath(n, dirStart, P1, geo){
+  const { apex, baseL, baseR, nLeft, nRight } = geo;
+  const segments = [];
+  let point = P1, dir = dirStart, face = 'right';
+  for (let bounce = 0; bounce < 4; bounce++){
+    const [a1,a2] = face === 'right' ? [apex,baseR] : [apex,baseL];
+    const faceN = face === 'right' ? nRight : nLeft;
+    const t = rayLineIntersect(point, dir, a1, a2);
+    const hit = t != null ? vadd(point, vscale(dir, t)) : vadd(point, vscale(dir, 300));
+    segments.push({ from: point, to: hit, hitPoint: hit, faceN, incomingDir: dir, bounce });
+    const dOut = vectorRefract(dir, faceN, n/1.0);
+    if (dOut){
+      return { segments, exitPoint: hit, exitDir: dOut, bounces: bounce };
+    }
+    const dRefl = vectorReflect(dir, faceN);
+    point = hit; dir = dRefl; face = (face === 'right') ? 'left' : 'right';
+  }
+  return { segments, exitPoint: null, exitDir: null, bounces: 4 };
+}
+function drawBiconvexLens(xPix){
+  const halfH = 108, bulge = 20;
+  ctx.save();
+  ctx.strokeStyle = "#7cb8ff"; ctx.fillStyle = "rgba(120,152,255,.08)"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(xPix, AXIS_Y-halfH);
+  ctx.quadraticCurveTo(xPix+bulge, AXIS_Y, xPix, AXIS_Y+halfH);
+  ctx.quadraticCurveTo(xPix-bulge, AXIS_Y, xPix, AXIS_Y-halfH);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+function drawConcaveMirror(ox){
+  const cx = ox+130, radius = 130, a1 = deg2rad(150), a2 = deg2rad(210);
+  ctx.save();
+  ctx.strokeStyle = "#7cb8ff"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, AXIS_Y, radius, a1, a2); ctx.stroke();
+  ctx.strokeStyle = "rgba(124,184,255,.5)"; ctx.lineWidth = 1.4;
+  for (let t = a1; t <= a2+1e-6; t += (a2-a1)/9){
+    const px = cx + radius*Math.cos(t), py = AXIS_Y + radius*Math.sin(t);
+    const nx = -Math.cos(t), ny = -Math.sin(t);
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+nx*10, py+ny*10); ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawBiconcaveLens(xPix){
+  const halfH = 108, halfW = 15, waistIn = 5;
+  ctx.save();
+  ctx.strokeStyle = "#7cb8ff"; ctx.fillStyle = "rgba(120,152,255,.08)"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(xPix-halfW, AXIS_Y-halfH);
+  ctx.quadraticCurveTo(xPix-halfW+waistIn, AXIS_Y, xPix-halfW, AXIS_Y+halfH);
+  ctx.lineTo(xPix+halfW, AXIS_Y+halfH);
+  ctx.quadraticCurveTo(xPix+halfW-waistIn, AXIS_Y, xPix+halfW, AXIS_Y-halfH);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+function drawConvexMirror(ox){
+  const cx = ox-130, radius = 130, a1 = deg2rad(-30), a2 = deg2rad(30);
+  ctx.save();
+  ctx.strokeStyle = "#7cb8ff"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, AXIS_Y, radius, a1, a2); ctx.stroke();
+  ctx.strokeStyle = "rgba(124,184,255,.5)"; ctx.lineWidth = 1.4;
+  for (let t = a1; t <= a2+1e-6; t += (a2-a1)/9){
+    const px = cx + radius*Math.cos(t), py = AXIS_Y + radius*Math.sin(t);
+    const nx = Math.cos(t), ny = Math.sin(t);
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+nx*10, py+ny*10); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* =========================================================================
+   3. SCENE DEFINITIONS
+   ========================================================================= */
+const RAY_SCENES = {};
+
+/* ---------- 1. CONVEX LENS ---------- */
+RAY_SCENES["ray-optics/convex-lens"] = {
+  title: "Convex Lens",
+  subline: "A converging lens forms a real or virtual image depending on where the object sits relative to F.",
+  controls: [
+    { key:"u",  label:"Object distance (u)", min:5, max:300, step:1, value:30, suffix:" cm" },
+    { key:"f",  label:"Focal length (f)",     min:5, max:200, step:1, value:15, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",   min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){
+    const uSigned = -p.u;
+    const denom = 1/p.f + 1/uSigned;
+    const infinite = Math.abs(denom) < 1e-4;
+    const v = infinite ? Infinity : 1/denom;
+    const m = infinite ? Infinity : v/uSigned;
+    return { uSigned, v, m, infinite };
+  },
+  draw(p, r){
+    clear();
+    const ox = 380;
+    const vForScale = isFinite(r.v) ? Math.min(Math.abs(r.v), p.f*4) : p.f*2;
+    const rightExtent = Math.max(p.f, vForScale);
+    const scale = fitScale(p.u+15, rightExtent+15, ox-30, CW-ox-30);
+    const vScale = Math.max(scale, 1.2);
+    drawAxis(ox);
+    drawTicks(ox, scale);
+    drawBiconvexLens(ox);
+    label("Lens", ox, AXIS_Y-130, "#7cb8ff", "center");
+    [-p.f, p.f].forEach(fx=>{
+      dot(ox+fx*scale, AXIS_Y, "#ffb162", 3);
+      label("F", ox+fx*scale, AXIS_Y+16, "#ffb162", "center");
+    });
+    const ho = p.ho;
+    const oxPix = ox + r.uSigned*scale;
+    arrowMark(oxPix, AXIS_Y-ho*vScale/6, "#eaf1ff", false, "Object");
+
+    if (r.infinite){
+      label("Image forms at infinity (u = f)", ox, 40, "#ffb162", "left", 13);
+      seg(oxPix, AXIS_Y-ho*vScale/6, ox, AXIS_Y-ho*vScale/6, "#45e6d4", 2);
+      seg(ox, AXIS_Y-ho*vScale/6, CW-10, AXIS_Y-ho*vScale/6, "#45e6d4", 2, [3,4]);
+      return;
+    }
+    const hi = r.m*ho;
+    const vPix = ox + clampAbs(r.v,rightExtent*1.3)*scale;
+    const real = r.v > 0;
+    const hiPix = AXIS_Y - clampAbs(hi,60)*vScale/6;
+
+    const y1 = AXIS_Y-ho*vScale/6;
+    rayArrow(oxPix, y1, ox, y1, "#45e6d4", 2);
+    if (real) rayArrow(ox, y1, vPix, hiPix, "#45e6d4", 2);
+    else {
+      const dirx = ox - vPix, diry = y1 - hiPix;
+      const len = Math.hypot(dirx,diry)||1;
+      rayArrow(ox, y1, ox+(dirx/len)*300, y1+(diry/len)*300, "#45e6d4", 2);
+      seg(ox, y1, vPix, hiPix, "#45e6d4", 1.4, [5,4]);
+    }
+    const dirx2 = ox-oxPix, diry2 = AXIS_Y-y1;
+    const len2 = Math.hypot(dirx2,diry2)||1;
+    rayArrow(oxPix, y1, ox+(dirx2/len2)*320, AXIS_Y+(diry2/len2)*320, "#9eff90", 1.6);
+
+    if (real){
+      arrowMark(vPix, hiPix, "#ffd9ae", false, r.m<0?"Real, inverted":"Real, erect");
+    } else {
+      arrowMark(vPix, hiPix, "#ffd9ae", true, "Virtual, erect");
+    }
+    label(`u=${fmt(-p.u,1)}  f=${fmt(p.f,1)}`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 1b. CONCAVE LENS ---------- */
+RAY_SCENES["ray-optics/concave-lens"] = {
+  title: "Concave Lens",
+  subline: "A diverging lens always forms a virtual, erect, diminished image — for any real object distance.",
+  controls: [
+    { key:"u",  label:"Object distance (u)", min:5, max:300, step:1, value:30, suffix:" cm" },
+    { key:"f",  label:"Focal length (f)",     min:5, max:200, step:1, value:15, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",   min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){
+    const fSigned = -p.f;
+    const uSigned = -p.u;
+    const denom = 1/fSigned + 1/uSigned;
+    const v = 1/denom;
+    const m = v/uSigned;
+    return { v, m };
+  },
+  draw(p, r){
+    clear();
+    const ox = 380;
+    const scale = fitScale(p.u+15, p.f+15, ox-30, CW-ox-30);
+    const vScale = Math.max(scale, 1.2);
+    drawAxis(ox);
+    drawTicks(ox, scale);
+    drawBiconcaveLens(ox);
+    label("Lens", ox, AXIS_Y-130, "#7cb8ff", "center");
+    [-p.f, p.f].forEach(fx=>{
+      dot(ox+fx*scale, AXIS_Y, "#ffb162", 3);
+      label("F", ox+fx*scale, AXIS_Y+16, "#ffb162", "center");
+    });
+    const ho = p.ho;
+    const oxPix = ox - p.u*scale;
+    const y1 = AXIS_Y - ho*vScale/6;
+    arrowMark(oxPix, y1, "#eaf1ff", false, "Object");
+
+    const hi = r.m*ho;
+    const vPix = ox + r.v*scale;
+    const hiPix = AXIS_Y - clampAbs(hi,60)*vScale/6;
+
+    rayArrow(oxPix, y1, ox, y1, "#45e6d4", 2);
+    const dirx = ox - vPix, diry = y1 - hiPix;
+    const len = Math.hypot(dirx,diry)||1;
+    rayArrow(ox, y1, ox+(dirx/len)*300, y1+(diry/len)*300, "#45e6d4", 2);
+    seg(ox, y1, vPix, hiPix, "#45e6d4", 1.4, [5,4]);
+
+    const dirx2 = ox-oxPix, diry2 = AXIS_Y-y1;
+    const len2 = Math.hypot(dirx2,diry2)||1;
+    rayArrow(oxPix, y1, ox+(dirx2/len2)*320, AXIS_Y+(diry2/len2)*320, "#9eff90", 1.6);
+
+    arrowMark(vPix, hiPix, "#ffd9ae", true, "Virtual, erect, diminished");
+    label(`u=${fmt(-p.u,1)}  f=${fmt(-p.f,1)}`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 2. CONCAVE MIRROR ---------- */
+RAY_SCENES["ray-optics/concave-mirror"] = {
+  title: "Concave Mirror",
+  subline: "Reflection formula 1/v = 1/f − 1/u (all distances measured positive in front of the mirror).",
+  controls: [
+    { key:"u",  label:"Object distance (u)", min:5, max:300, step:1, value:30, suffix:" cm" },
+    { key:"f",  label:"Focal length (f)",     min:3, max:150, step:1, value:10, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",   min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){
+    const denom = 1/p.f - 1/p.u;
+    const infinite = Math.abs(denom) < 1e-4;
+    const v = infinite ? Infinity : 1/denom;
+    const m = infinite ? Infinity : -v/p.u;
+    return { v, m, infinite };
+  },
+  draw(p, r){
+    clear();
+    const ox = 620;
+    const vCapped = isFinite(r.v) ? Math.min(Math.abs(r.v), p.f*4) : p.f*2;
+    const leftExtent = Math.max(p.u, 2*p.f, r.v>0 ? vCapped : 0) + 15;
+    const rightExtent = Math.max(p.f*0.6, r.v<0 ? vCapped : 0) + 15;
+    const scale = fitScale(leftExtent, rightExtent, ox-30, CW-ox-30);
+    const vScale = Math.max(scale, 1.2);
+    drawAxis(ox);
+    drawTicks(ox, scale);
+    drawConcaveMirror(ox);
+    label("Mirror", ox, AXIS_Y-138, "#7cb8ff", "center");
+    dot(ox-p.f*scale, AXIS_Y, "#ffb162", 3); label("F", ox-p.f*scale, AXIS_Y+16, "#ffb162", "center");
+    dot(ox-2*p.f*scale, AXIS_Y, "#ffb162", 3); label("C", ox-2*p.f*scale, AXIS_Y+16, "#ffb162", "center");
+
+    const ho = p.ho;
+    const oxPix = ox - p.u*scale;
+    const y1 = AXIS_Y - ho*vScale/6;
+    arrowMark(oxPix, y1, "#eaf1ff", false, "Object");
+
+    if (r.infinite){
+      label("Image forms at infinity (u = f)", 14, 40, "#ffb162", "left", 13);
+      seg(oxPix, y1, ox, y1, "#45e6d4", 2);
+      seg(ox, y1, -10, y1, "#45e6d4", 2, [3,4]);
+      return;
+    }
+    const hi = r.m*ho;
+    const real = r.v > 0;
+    const xImage = -r.v;
+    const clampBudget = Math.max(leftExtent, rightExtent)*1.3;
+    const xImagePix = ox + clampAbs(xImage,clampBudget)*scale;
+    const hiPix = AXIS_Y - clampAbs(hi,60)*vScale/6;
+
+    rayArrow(oxPix, y1, ox, y1, "#45e6d4", 2);
+    if (real){
+      rayArrow(ox, y1, xImagePix, hiPix, "#45e6d4", 2);
+    } else {
+      const dirx = ox-xImagePix, diry = y1-hiPix;
+      const len = Math.hypot(dirx,diry)||1;
+      rayArrow(ox, y1, ox-(dirx/len)*300, y1-(diry/len)*300, "#45e6d4", 2);
+      seg(ox, y1, xImagePix, hiPix, "#45e6d4", 1.4, [5,4]);
+    }
+    const cX = ox-2*p.f*scale;
+    rayArrow(oxPix, y1, cX, AXIS_Y, "#9eff90", 1.6);
+    rayArrow(cX, AXIS_Y, oxPix, y1, "#9eff90", 1.4);
+
+    if (real) arrowMark(xImagePix, hiPix, "#ffd9ae", false, r.m<0?"Real, inverted":"Real, erect");
+    else arrowMark(xImagePix, hiPix, "#ffd9ae", true, "Virtual, erect");
+    label(`u=${fmt(p.u,1)}  f=${fmt(p.f,1)}`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 2b. CONVEX MIRROR ---------- */
+RAY_SCENES["ray-optics/convex-mirror"] = {
+  title: "Convex Mirror",
+  subline: "A diverging mirror always forms a virtual, erect, diminished image behind the mirror — for any real object distance.",
+  controls: [
+    { key:"u",  label:"Object distance (u)", min:5, max:300, step:1, value:30, suffix:" cm" },
+    { key:"f",  label:"Focal length (f)",     min:3, max:150, step:1, value:10, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",   min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){
+    const fSigned = -p.f;
+    const denom = 1/fSigned - 1/p.u;
+    const v = 1/denom;
+    const m = -v/p.u;
+    return { v, m };
+  },
+  draw(p, r){
+    clear();
+    const ox = 460;
+    const scale = fitScale(p.u+15, p.f*2+15, ox-30, CW-ox-30);
+    const vScale = Math.max(scale, 1.2);
+    drawAxis(ox);
+    drawTicks(ox, scale);
+    drawConvexMirror(ox);
+    label("Mirror", ox, AXIS_Y-138, "#7cb8ff", "center");
+    dot(ox+p.f*scale, AXIS_Y, "#ffb162", 3); label("F", ox+p.f*scale, AXIS_Y+16, "#ffb162", "center");
+    dot(ox+2*p.f*scale, AXIS_Y, "#ffb162", 3); label("C", ox+2*p.f*scale, AXIS_Y+16, "#ffb162", "center");
+
+    const ho = p.ho;
+    const oxPix = ox - p.u*scale;
+    const y1 = AXIS_Y - ho*vScale/6;
+    arrowMark(oxPix, y1, "#eaf1ff", false, "Object");
+
+    const hi = r.m*ho;
+    const xImage = -r.v;
+    const xImagePix = ox + xImage*scale;
+    const hiPix = AXIS_Y - clampAbs(hi,60)*vScale/6;
+
+    rayArrow(oxPix, y1, ox, y1, "#45e6d4", 2);
+    const dirx = ox-xImagePix, diry = y1-hiPix;
+    const len = Math.hypot(dirx,diry)||1;
+    rayArrow(ox, y1, ox-(dirx/len)*300, y1-(diry/len)*300, "#45e6d4", 2);
+    seg(ox, y1, xImagePix, hiPix, "#45e6d4", 1.4, [5,4]);
+
+    const cX = ox+2*p.f*scale;
+    rayArrow(oxPix, y1, cX, AXIS_Y, "#9eff90", 1.6);
+    rayArrow(cX, AXIS_Y, oxPix, y1, "#9eff90", 1.4);
+
+    arrowMark(xImagePix, hiPix, "#ffd9ae", true, "Virtual, erect, diminished");
+    label(`u=${fmt(p.u,1)}  f=${fmt(-p.f,1)}`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 3. TOTAL INTERNAL REFLECTION ---------- */
+RAY_SCENES["ray-optics/tir"] = {
+  title: "Total Internal Reflection",
+  subline: "Light travelling from a denser medium hits the boundary. Past the critical angle, it reflects entirely.",
+  controls: [
+    { key:"n", label:"Refractive index (denser medium)", min:1.05, max:3.0, step:0.01, value:1.5, suffix:"" },
+    { key:"i", label:"Angle of incidence", min:0, max:89, step:1, value:30, suffix:"°" },
+  ],
+  compute(p){
+    const critical = rad2deg(Math.asin(1/p.n));
+    const isTIR = p.i >= critical;
+    let exitAngle = null;
+    if (!isTIR){
+      const s = p.n*Math.sin(deg2rad(p.i));
+      exitAngle = rad2deg(Math.asin(Math.min(1,s)));
+    }
+    return { critical, isTIR, exitAngle };
+  },
+  draw(p, r){
+    clear();
+    const ox = 300, oy = AXIS_Y;
+    ctx.fillStyle = "rgba(120,152,255,.09)"; ctx.fillRect(0, oy, CW, CH-oy);
+    ctx.fillStyle = "rgba(69,230,212,.04)"; ctx.fillRect(0, 0, CW, oy);
+    seg(0, oy, CW, oy, "#7cb8ff", 2);
+    seg(ox, oy-160, ox, oy+160, "rgba(154,172,204,.4)", 1, [4,4]);
+    label("Denser medium (n)", ox, oy+150, "#9aaccc", "center");
+    label("Rarer medium (air)", ox, oy-140, "#9aaccc", "center");
+
+    const nIn = {x:0,y:-1};
+    const dIncident = vnorm(rotate({x:0,y:-1}, p.i));
+    const srcLen = 150;
+    const src = vsub({x:ox,y:oy}, vscale(dIncident, srcLen));
+    rayArrow(src.x, src.y, ox, oy, "#eaf1ff", 2.2);
+    label("Incident", src.x, src.y-8, "#eaf1ff", "left", 11);
+
+    if (r.isTIR){
+      const dRefl = vectorReflect(dIncident, nIn);
+      rayArrow(ox, oy, ox+dRefl.x*srcLen, oy+dRefl.y*srcLen, "#45e6d4", 2.4);
+      label("Total internal reflection", 16, 30, "#ffb162", "left", 13);
+    } else {
+      const dRefr = vectorRefract(dIncident, nIn, p.n/1.0);
+      if (dRefr){
+        rayArrow(ox, oy, ox+dRefr.x*srcLen, oy+dRefr.y*srcLen, "#45e6d4", 2.4);
+        label("Refracted", ox+dRefr.x*srcLen, oy+dRefr.y*srcLen-8, "#45e6d4", "left", 11);
+      }
+      const dRefl = vectorReflect(dIncident, nIn);
+      seg(ox, oy, ox+dRefl.x*srcLen*0.6, oy+dRefl.y*srcLen*0.6, "rgba(158,255,144,.5)", 1.6);
+    }
+    const dCrit = vnorm(rotate({x:0,y:-1}, r.critical));
+    seg(ox, oy, ox+dCrit.x*100, oy+dCrit.y*100, "rgba(255,177,98,.55)", 1.4, [3,3]);
+    label(`critical angle ≈ ${r.critical.toFixed(1)}°`, ox+dCrit.x*105, oy+dCrit.y*105, "#ffb162", "left", 11);
+  }
+};
+
+/* ---------- 4. PRISM ---------- */
+RAY_SCENES["ray-optics/prism"] = {
+  title: "Prism Dispersion",
+  subline: "Refraction at two surfaces bends the ray by the deviation angle δ = i₁ + i₂ − A.",
+  controls: [
+    { key:"A",  label:"Apex angle (A)",         min:10, max:120, step:1, value:60, suffix:"°" },
+    { key:"n",  label:"Refractive index (n)",   min:1.1, max:2.5, step:0.01, value:1.5, suffix:"" },
+    { key:"i1", label:"Angle of incidence (i₁)",min:5, max:85, step:1, value:45, suffix:"°" },
+    { key:"size", label:"Prism drawing size",   min:0.5, max:2, step:0.1, value:1, suffix:"×" },
+    { key:"showNormals", label:"Show normals", type:"checkbox", value:true },
+    { key:"showAngles", label:"Show angle labels", type:"checkbox", value:true },
+    { key:"showDispersion", label:"Show dispersion (spectrum)", type:"checkbox", value:false },
+  ],
+  presets: [
+    { label:"Set minimum deviation", apply(p){
+        const arg = p.n*Math.sin(deg2rad(p.A/2));
+        if (arg > 1) return null;
+        return { i1: Math.round(rad2deg(Math.asin(arg))*10)/10 };
+      }, unreachableMessage: "Minimum deviation isn't reachable — try a smaller apex angle or refractive index."
+    },
+    { label:"Set maximum deviation (grazing emergence)", apply(p){
+        const critical = rad2deg(Math.asin(Math.min(1, 1/p.n)));
+        const r1Target = p.A - critical;
+        if (r1Target < 0) return null;
+        const arg = p.n*Math.sin(deg2rad(r1Target));
+        if (arg > 1) return null;
+        const i1Exact = rad2deg(Math.asin(arg));
+        const i1Safe = Math.min(89, i1Exact + 0.3);
+        return { i1: Math.round(i1Safe*10)/10 };
+      }, unreachableMessage: "Grazing emergence isn't reachable for this apex angle — light TIRs at the second face for every i₁."
+    },
+  ],
+  compute(p){
+    const a2 = p.A/2;
+    const r1rad = Math.asin(Math.min(1, Math.sin(deg2rad(p.i1))/p.n));
+    const r1 = rad2deg(r1rad);
+    const r2 = p.A - r1;
+    const secondArg = p.n*Math.sin(deg2rad(r2));
+    const tirAtSecond = secondArg > 1;
+    let i2 = null, delta = null;
+    if (!tirAtSecond){
+      i2 = rad2deg(Math.asin(secondArg));
+      delta = p.i1 + i2 - p.A;
+    }
+    const deltaMin = 2*rad2deg(Math.asin(Math.min(1,p.n*Math.sin(deg2rad(a2))))) - p.A;
+    const critical = rad2deg(Math.asin(Math.min(1, 1/p.n)));
+    const r1Grazing = p.A - critical;
+    let deltaGrazing = null;
+    if (r1Grazing >= 0){
+      const argG = p.n*Math.sin(deg2rad(r1Grazing));
+      if (argG <= 1) deltaGrazing = rad2deg(Math.asin(argG)) + 90 - p.A;
+    }
+    return { r1, r2, i2, delta, tirAtSecond, deltaMin, deltaGrazing };
+  },
+  draw(p, r){
+    clear();
+    const a2 = deg2rad(p.A/2);
+    const apex = {x:440, y:40};
+    const faceLen = Math.min(350, 260*p.size);
+    const leftDir  = {x:-Math.sin(a2), y:Math.cos(a2)};
+    const rightDir = {x: Math.sin(a2), y:Math.cos(a2)};
+    const baseL = vadd(apex, vscale(leftDir, faceLen));
+    const baseR = vadd(apex, vscale(rightDir, faceLen));
+    const nLeft  = vnorm({x:-leftDir.y,  y: leftDir.x});
+    const nRight = vnorm({x: rightDir.y, y:-rightDir.x});
+    const geo = { apex, baseL, baseR, nLeft, nRight };
+
+    ctx.save();
+    ctx.strokeStyle = "#7cb8ff"; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(apex.x,apex.y); ctx.lineTo(baseL.x,baseL.y);
+    ctx.lineTo(baseR.x,baseR.y); ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = "rgba(120,152,255,.06)"; ctx.fill();
+    ctx.restore();
+    label(`A = ${p.A}°`, apex.x, apex.y-14, "#9aaccc", "center");
+
+    const P1 = vadd(apex, vscale(leftDir, faceLen*0.55));
+    const incomingOffset = rotate(nLeft, -p.i1);
+    const src = vadd(P1, vscale(incomingOffset, 190));
+    rayArrow(src.x, src.y, P1.x, P1.y, "#eaf1ff", 2.2);
+    const dIn = vnorm(vsub(P1, src));
+
+    if (p.showNormals){
+      seg(P1.x-nLeft.x*40, P1.y-nLeft.y*40, P1.x+nLeft.x*160, P1.y+nLeft.y*160, "rgba(154,172,204,.4)", 1, [3,3]);
+    }
+
+    const nInward = {x:-nLeft.x, y:-nLeft.y};
+    const dRefr1 = vectorRefract(dIn, nInward, 1/p.n);
+    if (!dRefr1){
+      label("Unexpected TIR at entry face — try a smaller i₁", 16, 30, "#ff9fa3", "left", 12);
+      return;
+    }
+
+    if (p.showAngles && !p.showDispersion){
+      drawAngleArc(P1, vnorm(vscale(dIn,-1)), nLeft, 34, "#eaf1ff", `i₁=${p.i1}°`);
+      drawAngleArc(P1, dRefr1, nInward, 26, "#45e6d4", `r₁=${r.r1.toFixed(1)}°`);
+    }
+
+    if (p.showDispersion){
+      const spread = (p.n-1)/0.5;
+      const COLORS = [
+        { name:"Violet", hex:"#b388ff", dn: 0.020*spread },
+        { name:"Blue",   hex:"#7cb8ff", dn: 0.012*spread },
+        { name:"Green",  hex:"#9eff90", dn: 0.002*spread },
+        { name:"Yellow", hex:"#fff176", dn:-0.006*spread },
+        { name:"Orange", hex:"#ffb162", dn:-0.013*spread },
+        { name:"Red",    hex:"#ff8a80", dn:-0.020*spread },
+      ];
+      COLORS.forEach(c=>{
+        const nColor = Math.max(1.01, p.n + c.dn);
+        const dRefrC = vectorRefract(dIn, nInward, 1/nColor);
+        if (!dRefrC) return;
+        const path = tracePrismPath(nColor, dRefrC, P1, geo);
+        path.segments.forEach(s => rayArrow(s.from.x, s.from.y, s.to.x, s.to.y, c.hex, 1.8));
+        if (path.exitDir){
+          rayArrow(path.exitPoint.x, path.exitPoint.y, path.exitPoint.x+path.exitDir.x*180, path.exitPoint.y+path.exitDir.y*180, c.hex, 1.8);
+        }
+      });
+      label("Dispersion is stylised for teaching — violet bends most, red least", 16, 30, "#9aaccc", "left", 12);
+      return;
+    }
+
+    const path = tracePrismPath(p.n, dRefr1, P1, geo);
+    path.segments.forEach((s,idx)=>{
+      const isFirst = idx === 0;
+      rayArrow(s.from.x, s.from.y, s.to.x, s.to.y, isFirst ? "#45e6d4" : "#ffb162", 2.2);
+      if (p.showNormals){
+        const fn = s.faceN;
+        seg(s.to.x-fn.x*160, s.to.y-fn.y*160, s.to.x+fn.x*40, s.to.y+fn.y*40, "rgba(154,172,204,.4)", 1, [3,3]);
+      }
+      if (idx === 0 && p.showAngles){
+        drawAngleArc(s.to, vnorm(vscale(s.incomingDir,-1)), vnorm(vscale(s.faceN,-1)), 26, "#45e6d4", `r₂=${r.r2.toFixed(1)}°`);
+      }
+    });
+
+    if (path.exitDir){
+      rayArrow(path.exitPoint.x, path.exitPoint.y, path.exitPoint.x+path.exitDir.x*220, path.exitPoint.y+path.exitDir.y*220, "#9eff90", 2.2);
+      if (p.showAngles && path.bounces === 0){
+        drawAngleArc(path.exitPoint, path.exitDir, path.segments[0].faceN, 34, "#9eff90", `i₂=${r.i2.toFixed(1)}°`);
+      }
+      const deltaLabel = path.bounces === 0
+        ? `δ = ${fmt(r.delta,1)}°`
+        : `Emerges after ${path.bounces} internal reflection${path.bounces>1?'s':''}`;
+      label(deltaLabel, path.exitPoint.x+path.exitDir.x*230, path.exitPoint.y+path.exitDir.y*230, "#9eff90", "left", 12);
+    } else {
+      label(`TIR at the 2nd face — ray keeps reflecting inside (stopped after ${path.bounces} bounces)`, 16, 30, "#ffb162", "left", 12.5);
+    }
+  }
+};
+
+/* ---------- 5. GLASS SLAB ---------- */
+RAY_SCENES["ray-optics/glass-slab"] = {
+  title: "Glass Slab",
+  subline: "A ray through a parallel-sided slab emerges parallel to the incident ray, laterally shifted.",
+  controls: [
+    { key:"n", label:"Refractive index (n)", min:1.05, max:2.5, step:0.01, value:1.5, suffix:"" },
+    { key:"i", label:"Angle of incidence",   min:5, max:85, step:1, value:40, suffix:"°" },
+    { key:"t", label:"Slab thickness",       min:1, max:40, step:0.5, value:4, suffix:" cm" },
+  ],
+  compute(p){
+    const rRad = Math.asin(Math.min(1, Math.sin(deg2rad(p.i))/p.n));
+    const r = rad2deg(rRad);
+    const shift = p.t * Math.sin(deg2rad(p.i-r)) / Math.cos(rRad);
+    return { r, shift };
+  },
+  draw(p, r){
+    clear();
+    const slabScale = Math.max(3, Math.min(14, 240/p.t));
+    const topY = 100, botY = topY + p.t*slabScale;
+    seg(0, topY, CW, topY, "#7cb8ff", 2);
+    seg(0, botY, CW, botY, "#7cb8ff", 2);
+    const glassGrad = ctx.createLinearGradient(0, topY, 0, botY);
+    glassGrad.addColorStop(0, "rgba(120,152,255,.14)");
+    glassGrad.addColorStop(0.5, "rgba(120,152,255,.05)");
+    glassGrad.addColorStop(1, "rgba(120,152,255,.14)");
+    ctx.fillStyle = glassGrad;
+    ctx.fillRect(0, topY, CW, botY-topY);
+    label(`Glass slab  n=${p.n.toFixed(2)}  t=${p.t}cm`, 16, (topY+botY)/2+4, "#9aaccc", "left", 12);
+
+    const P1 = {x:340, y:topY};
+    const dIncident = vnorm(rotate({x:0,y:1}, p.i));
+    const src = vsub(P1, vscale(dIncident, 160));
+    rayArrow(src.x, src.y, P1.x, P1.y, "#eaf1ff", 2.2);
+
+    const dRefr = vectorRefract(dIncident, {x:0,y:-1}, 1/p.n);
+    const t2 = rayLineIntersect(P1, dRefr, {x:0,y:botY}, {x:CW,y:botY});
+    const P2 = vadd(P1, vscale(dRefr, t2));
+    rayArrow(P1.x, P1.y, P2.x, P2.y, "#45e6d4", 2.2);
+
+    const dOut = vectorRefract(dRefr, {x:0,y:-1}, p.n/1.0);
+    if (dOut) rayArrow(P2.x, P2.y, P2.x+dOut.x*160, P2.y+dOut.y*160, "#9eff90", 2.2);
+
+    seg(P1.x, P1.y, P1.x+dIncident.x*(botY-topY+160), P1.y+dIncident.y*(botY-topY+160), "rgba(234,241,255,.35)", 1.4, [4,4]);
+    label(`lateral shift ≈ ${r.shift.toFixed(2)} cm`, 16, 30, "#9eff90", "left", 13);
+  }
+};
+
+/* ---------- 5b. LENS + SLAB SHIFT ---------- */
+RAY_SCENES["ray-optics/lens-slab-shift"] = {
+  title: "Lens + Slab Shift",
+  subline: "Insert a glass slab between a lens and its screen, and the focus shifts past the screen. Find how far to move the object to refocus it.",
+  controls: [
+    { key:"u", label:"Object distance (u)",  min:20, max:400, step:1,   value:240, suffix:" cm" },
+    { key:"v", label:"Screen distance (v)",  min:2,  max:100, step:0.5, value:12,  suffix:" cm" },
+    { key:"t", label:"Slab thickness (t)",   min:0.5,max:20,  step:0.5, value:1,   suffix:" cm" },
+    { key:"n", label:"Slab refractive index (n)", min:1.05, max:2.5, step:0.01, value:1.5, suffix:"" },
+  ],
+  compute(p){
+    if (p.u<=0 || p.v<=0) throw new Error("Object and screen distances must be positive.");
+    const f = (p.u*p.v)/(p.u+p.v);
+    const delta = p.t*(1-1/p.n);
+    const vPrime = p.v - delta;
+    if (vPrime<=0) throw new Error("The slab is too thick for this screen distance — no real refocus is possible.");
+    const denom = 1/f - 1/vPrime;
+    if (Math.abs(denom) < 1e-9) throw new Error("The refocused object would sit at infinity — reduce the slab thickness.");
+    const uPrime = 1/denom;
+    if (uPrime<=0) throw new Error("No real object position refocuses the image with these settings.");
+    const shift = uPrime - p.u;
+    return { f, delta, vPrime, uPrime, shift };
+  },
+  draw(p, r){
+    clear();
+    const ox = 300, screenX = CW-90;
+    const leftExtent = Math.max(p.u, r.uPrime) + 20;
+    const leftScale = Math.max(0.25, Math.min(4, (ox-24)/leftExtent));
+    const rightScale = Math.max(4, Math.min(60, (screenX-ox-20)/Math.max(p.v, r.vPrime, p.t)));
+
+    drawAxis(ox);
+    drawBiconvexLens(ox);
+    label("Lens", ox, AXIS_Y-130, "#7cb8ff", "center");
+
+    seg(screenX, AXIS_Y-130, screenX, AXIS_Y+130, "#dce8ff", 3);
+    label("Screen (fixed)", screenX, AXIS_Y-142, "#dce8ff", "center", 12);
+
+    const slabW = Math.min(p.t*rightScale, screenX-ox-14);
+    const slabL = screenX-slabW, slabR = screenX;
+    const grad = ctx.createLinearGradient(slabL,0,slabR,0);
+    grad.addColorStop(0,"rgba(120,152,255,.05)");
+    grad.addColorStop(0.5,"rgba(120,152,255,.18)");
+    grad.addColorStop(1,"rgba(120,152,255,.05)");
+    ctx.save();
+    ctx.fillStyle = grad; ctx.fillRect(slabL, AXIS_Y-130, slabW, 260);
+    ctx.strokeStyle = "#7cb8ff"; ctx.lineWidth = 1.4;
+    ctx.strokeRect(slabL, AXIS_Y-130, slabW, 260);
+    ctx.restore();
+    label(`n=${p.n.toFixed(2)}  t=${p.t}cm`, (slabL+slabR)/2, AXIS_Y+146, "#9aaccc", "center", 11);
+
+    const ho = 16, y = AXIS_Y-ho;
+
+    const objX0 = ox - p.u*leftScale;
+    arrowMark(objX0, y, "rgba(234,241,255,.45)", false, "Original object (u)");
+    seg(objX0, y, ox, y, "rgba(255,177,98,.5)", 1.6, [5,4]);
+    const blurX = screenX + r.delta*rightScale;
+    seg(ox, y, blurX, AXIS_Y, "rgba(255,177,98,.5)", 1.6, [5,4]);
+    dot(blurX, AXIS_Y, "#ffb162", 4);
+    label("unfocused — true image now here", blurX, AXIS_Y-14, "#ffb162", "left", 10.5);
+
+    const objX1 = ox - r.uPrime*leftScale;
+    if (objX1 > 6){
+      arrowMark(objX1, y, "#eaf1ff", false, "Shifted object (u′)");
+      rayArrow(objX1, y, ox, y, "#45e6d4", 2.2);
+      rayArrow(ox, y, screenX, AXIS_Y, "#9eff90", 2.2);
+      dot(screenX, AXIS_Y, "#9eff90", 4.5);
+      label("Refocused image", screenX-8, AXIS_Y-16, "#9eff90", "right", 11);
+    } else {
+      label("Shifted object position falls outside the visible range.", 14, 40, "#ff9fa3", "left", 12);
+    }
+
+    label(`Move the object ${r.shift>0?'away from':'toward'} the lens by ${fmt(Math.abs(r.shift),2)} cm`, 14, 26, "#9eff90", "left", 13);
+    label(`f=${fmt(r.f,2)}cm   apparent shift from slab δ=${fmt(r.delta,3)}cm`, 14, CH-14, "#9aaccc", "left", 11);
+  }
+};
+
+/* ---------- 6. LENS COMBINATION ---------- */
+RAY_SCENES["ray-optics/lens-combination"] = {
+  title: "Lens Combination",
+  subline: "The image from the first lens becomes the object for the second — real or virtual, it still works.",
+  controls: [
+    { key:"u",  label:"Object distance (u)",     min:5, max:200, step:1, value:25, suffix:" cm" },
+    { key:"f1", label:"Lens 1 focal length",     min:3, max:150, step:1, value:10, suffix:" cm" },
+    { key:"f2", label:"Lens 2 focal length",     min:-150, max:150, step:1, value:-15, suffix:" cm" },
+    { key:"d",  label:"Separation between lenses", min:2, max:150, step:1, value:15, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",      min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){
+    const f2 = Math.abs(p.f2) < 1 ? (p.f2<0?-1:1) : p.f2;
+    const uSigned = -p.u;
+    const den1 = 1/p.f1 + 1/uSigned;
+    const v1 = Math.abs(den1)<1e-4 ? Infinity : 1/den1;
+    const m1 = isFinite(v1) ? v1/uSigned : Infinity;
+    const u2 = v1 - p.d;
+    const den2 = 1/f2 + 1/u2;
+    const v2 = Math.abs(den2)<1e-4 ? Infinity : 1/den2;
+    const m2 = isFinite(v2) ? v2/u2 : Infinity;
+    const mTotal = m1*m2;
+    return { v1, m1, u2, v2, m2, mTotal, f2 };
+  },
+  draw(p, r){
+    clear();
+    const ox1 = 260;
+    const fRef = Math.abs(r.f2) || 50;
+    const v1Capped = isFinite(r.v1) ? Math.min(Math.abs(r.v1), p.f1*4) : p.f1*2;
+    const v2Capped = isFinite(r.v2) ? Math.min(Math.abs(r.v2), fRef*4) : fRef*2;
+    const leftExtent = p.u + 15;
+    const rightExtent = p.d + Math.max(v1Capped, v2Capped, fRef) + 15;
+    const scale = fitScale(leftExtent, rightExtent, ox1-30, CW-ox1-30);
+    const vScale = Math.max(scale, 1.2);
+    const ox2 = ox1 + p.d*scale;
+    drawAxis(ox1);
+    drawTicks(ox1, scale);
+    drawBiconvexLens(ox1);
+    label("L1", ox1, AXIS_Y-130, "#7cb8ff", "center");
+    ctx.save(); ctx.translate(ox2,0);
+    if (r.f2 > 0){ drawBiconvexLens(0); } else {
+      ctx.strokeStyle = "#83b8ff"; ctx.fillStyle="rgba(120,152,255,.08)"; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-14, AXIS_Y-100); ctx.quadraticCurveTo(4, AXIS_Y-100, 4, AXIS_Y-108);
+      ctx.lineTo(4, AXIS_Y+108); ctx.quadraticCurveTo(4, AXIS_Y+100, -14, AXIS_Y+100);
+      ctx.quadraticCurveTo(0, AXIS_Y, -14, AXIS_Y-100);
+      ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    label("L2", ox2, AXIS_Y-130, "#83b8ff", "center");
+
+    const ho = p.ho;
+    const objPix = ox1 - p.u*scale;
+    const y1 = AXIS_Y - ho*vScale/6;
+    arrowMark(objPix, y1, "#eaf1ff", false, "Object");
+
+    if (!isFinite(r.v1)){
+      label("Image 1 forms at infinity — ray emerges parallel", 16, 30, "#ffb162", "left", 13);
+      rayArrow(objPix, y1, ox1, y1, "#45e6d4", 1.6);
+      rayArrow(ox1, y1, CW-10, y1, "#45e6d4", 1.6);
+      return;
+    }
+
+    const hi1 = r.m1*ho;
+    const xi1 = ox1 + clampAbs(r.v1,rightExtent*1.3)*scale;
+    const yi1 = AXIS_Y - clampAbs(hi1,60)*vScale/6;
+    arrowMark(xi1, yi1, "rgba(255,217,174,.7)", r.v1<0, "Image 1 (construction)");
+    rayArrow(objPix, y1, ox1, y1, "#45e6d4", 1.6);
+
+    const denomX = (xi1 - ox1) || 1e-6;
+    const heightAtLens2 = y1 + (yi1 - y1) * (ox2 - ox1) / denomX;
+    rayArrow(ox1, y1, ox2, heightAtLens2, "#45e6d4", 1.6);
+    if (r.v1 > 0 && xi1 < ox2) dot(xi1, yi1, "#ffd9ae", 3);
+
+    if (isFinite(r.v2)){
+      const hi2 = r.mTotal*ho;
+      const xf = ox2 + clampAbs(r.v2,rightExtent*1.3)*scale;
+      const yf = AXIS_Y - clampAbs(hi2,60)*vScale/6;
+      if (r.v2 > 0){
+        rayArrow(ox2, heightAtLens2, xf, yf, "#9eff90", 1.8);
+      } else {
+        const dirx = ox2-xf, diry = heightAtLens2-yf;
+        const len = Math.hypot(dirx,diry)||1;
+        rayArrow(ox2, heightAtLens2, ox2+(dirx/len)*160, heightAtLens2+(diry/len)*160, "#9eff90", 1.8);
+        seg(ox2, heightAtLens2, xf, yf, "#9eff90", 1.3, [5,4]);
+      }
+      arrowMark(xf, yf, "#9eff90", r.v2<0, r.v2>0?"Final image (real)":"Final image (virtual)");
+    } else {
+      label("Final image forms at infinity — ray emerges parallel", 16, 30, "#ffb162", "left", 13);
+      rayArrow(ox2, heightAtLens2, CW-10, heightAtLens2, "#9eff90", 1.8);
+    }
+    label(`u=${p.u}  f1=${p.f1}  f2=${r.f2}  d=${p.d}`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 7. PLANE MIRROR ---------- */
+RAY_SCENES["ray-optics/plane-mirror"] = {
+  title: "Plane Mirror",
+  subline: "A plane mirror always forms a virtual, erect, same-size image at an equal distance behind the mirror.",
+  controls: [
+    { key:"u",  label:"Object distance from mirror", min:5, max:200, step:1, value:15, suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",          min:6, max:32, step:1, value:18, suffix:" cm" },
+  ],
+  compute(p){ return { v: p.u }; },
+  draw(p, r){
+    clear();
+    const ox = 440;
+    const extent = p.u + 15;
+    const scale = fitScale(extent, extent, ox-30, CW-ox-30);
+    const vScale = Math.max(scale, 1.2);
+    drawAxis(ox);
+    drawTicks(ox, scale);
+    seg(ox, AXIS_Y-120, ox, AXIS_Y+120, "#7cb8ff", 4);
+    ctx.strokeStyle = "rgba(124,184,255,.5)"; ctx.lineWidth = 1.2;
+    for (let yy=AXIS_Y-114; yy<=AXIS_Y+114; yy+=14){
+      ctx.beginPath(); ctx.moveTo(ox+2,yy); ctx.lineTo(ox+12,yy+8); ctx.stroke();
+    }
+    label("Mirror", ox, AXIS_Y-128, "#7cb8ff", "center");
+    const ho = p.ho;
+    const objPix = ox - p.u*scale;
+    const imgPix = ox + p.u*scale;
+    const y1 = AXIS_Y - ho*vScale/9;
+    arrowMark(objPix, y1, "#eaf1ff", false, "Object");
+    arrowMark(imgPix, y1, "#9eff90", true, "Virtual image");
+    rayArrow(objPix, y1, ox, y1, "#45e6d4", 2);
+    rayArrow(ox, y1, ox+120, y1-60, "#45e6d4", 2);
+    seg(ox, y1, imgPix, y1, "rgba(158,255,144,.4)", 1.2, [4,4]);
+    label(`u = v = ${p.u} cm`, 14, 26, "#9aaccc", "left", 12);
+  }
+};
+
+/* ---------- 8. SNELL'S WINDOW ---------- */
+RAY_SCENES["ray-optics/snells-window"] = {
+  title: "Snell's Window",
+  subline: "Looking up from underwater, the entire sky above compresses into a cone of angle 2×critical angle.",
+  controls: [
+    { key:"n",     label:"Refractive index of water (n)", min:1.2, max:1.6, step:0.01, value:1.33, suffix:"" },
+    { key:"depth", label:"Depth of the eye",               min:1, max:10, step:0.5, value:3, suffix:" m" },
+  ],
+  compute(p){
+    const critical = rad2deg(Math.asin(1/p.n));
+    const scalePxPerM = 22;
+    const windowRadius = p.depth*Math.tan(deg2rad(critical));
+    return { critical, windowRadius, scalePxPerM };
+  },
+  draw(p, r){
+    clear();
+    const surfaceY = 90, scalePx = r.scalePxPerM;
+    seg(0, surfaceY, CW, surfaceY, "#7cb8ff", 2);
+    label("Water surface", 16, surfaceY-10, "#9aaccc", "left", 12);
+    const eye = {x:440, y: surfaceY + p.depth*scalePx};
+    dot(eye.x, eye.y, "#eaf1ff", 4);
+    label("Eye", eye.x, eye.y+20, "#eaf1ff", "center", 12);
+
+    const edgeL = {x: eye.x - r.windowRadius*scalePx, y: surfaceY};
+    const edgeR = {x: eye.x + r.windowRadius*scalePx, y: surfaceY};
+    seg(eye.x, eye.y, edgeL.x, edgeL.y, "rgba(255,177,98,.6)", 1.6, [3,3]);
+    seg(eye.x, eye.y, edgeR.x, edgeR.y, "rgba(255,177,98,.6)", 1.6, [3,3]);
+    label(`window ≈ ${(2*r.windowRadius).toFixed(2)} m across`, eye.x, surfaceY-24, "#ffb162", "center", 12);
+
+    [-70,-40,-15,15,40,70].forEach(deg=>{
+      const surfPt = { x: eye.x + Math.tan(deg2rad(deg))*p.depth*scalePx*0.35, y: surfaceY };
+      if (Math.abs(surfPt.x-eye.x) > r.windowRadius*scalePx*1.4) return;
+      const dAir = vnorm(rotate({x:0,y:1}, deg));
+      const src = vsub(surfPt, vscale(dAir, 90));
+      seg(src.x, src.y, surfPt.x, surfPt.y, "rgba(234,241,255,.45)", 1.3);
+      const dWater = vectorRefract(dAir, {x:0,y:-1}, 1/p.n);
+      if (dWater){
+        const tEye = rayLineIntersect(surfPt, dWater, eye, vadd(eye,{x:1,y:0}));
+        seg(surfPt.x, surfPt.y, eye.x, eye.y, "#45e6d4", 1.3);
+      }
+    });
+    label(`critical angle ≈ ${r.critical.toFixed(1)}°`, 16, 30, "#ffb162", "left", 13);
+  }
+};
+
+/* ---------- 9. OPTICAL BENCH ---------- */
+const BENCH_LENGTH = 60, BENCH_OX = 40, BENCH_SCALE = 13.5;
+const benchState = { elements: [], selectedId: null, nextId: 1, activeTool: "lensConv", draggingId: null };
+
+function traceBench(objX0, ho, els){
+  const sorted = els.slice().sort((a,b)=>a.x-b.x);
+  let ptr = sorted.findIndex(el => el.x > objX0);
+  if (ptr === -1) ptr = sorted.length;
+  let direction = 1;
+  let objX = objX0, heightScale = 1, lastVSign = true;
+  let heightIn = ho;
+  const steps = [];
+  const legs = [];
+  const visits = {};
+  let iterations = 0;
+  const MAX_ITER = 24;
+  let blockedAt = null;
+
+  while (iterations++ < MAX_ITER){
+    if (direction === 1 ? ptr >= sorted.length : ptr < 0) break;
+    const el = sorted[ptr];
+    visits[el.id] = (visits[el.id]||0) + 1;
+    if (visits[el.id] > 5){
+      steps.push(`Stopped: the ray keeps bouncing near one element (possible mirror trap).`);
+      break;
+    }
+    const uLocal = direction === 1 ? (objX - el.x) : (el.x - objX);
+    let vLocal, m, prismBlocked = false;
+
+    if (el.type === "lens"){
+      let uu = Math.abs(uLocal) < 1e-3 ? (uLocal<0?-1e-3:1e-3) : uLocal;
+      const denom = 1/el.f + 1/uu;
+      vLocal = Math.abs(denom) < 1e-4 ? 1e6 : 1/denom;
+      m = vLocal/uu;
+      steps.push(`Lens (f=${el.f}cm) at x=${el.x}cm: u=${uu.toFixed(2)}cm → v=${vLocal.toFixed(2)}cm, m=${m.toFixed(2)}`);
+    } else if (el.type === "mirror"){
+      const uMirror = -uLocal;
+      let uu = Math.abs(uMirror) < 1e-3 ? (uMirror<0?-1e-3:1e-3) : uMirror;
+      const denom = 1/el.f - 1/uu;
+      const vMirror = Math.abs(denom) < 1e-4 ? 1e6 : 1/denom;
+      m = -vMirror/uu;
+      vLocal = -vMirror;
+      steps.push(`Mirror (f=${el.f}cm) at x=${el.x}cm: u=${uu.toFixed(2)}cm → v=${vMirror.toFixed(2)}cm, m=${m.toFixed(2)} — beam reverses`);
+    } else if (el.type === "planeMirror"){
+      vLocal = -uLocal;
+      m = 1;
+      steps.push(`Plane mirror at x=${el.x}cm: image forms ${Math.abs(uLocal).toFixed(2)}cm behind it — beam reverses`);
+    } else if (el.type === "slab"){
+      const shift = el.thickness*(1 - 1/el.n);
+      vLocal = uLocal + shift;
+      m = 1;
+      steps.push(`Slab (t=${el.thickness}cm, n=${el.n}) at x=${el.x}cm: apparent shift +${shift.toFixed(2)}cm`);
+    } else if (el.type === "prism"){
+      vLocal = uLocal;
+      m = 1;
+      const r1 = rad2deg(Math.asin(Math.min(1, Math.sin(deg2rad(el.i1))/el.n)));
+      const r2 = el.A - r1;
+      const secondArg = el.n*Math.sin(deg2rad(r2));
+      if (secondArg > 1){
+        prismBlocked = true;
+        steps.push(`Prism (A=${el.A}°, n=${el.n}) at x=${el.x}cm: TIR at the second face — no emergent ray at i₁=${el.i1}°. The beam stops here.`);
+      } else {
+        const i2 = rad2deg(Math.asin(secondArg));
+        const delta = el.i1 + i2 - el.A;
+        steps.push(`Prism (A=${el.A}°, n=${el.n}) at x=${el.x}cm: deviation δ=${delta.toFixed(2)}° (shown for reference only — doesn't affect image position here)`);
+      }
+    }
+
+    const isReflective = (el.type === "mirror" || el.type === "planeMirror");
+    const isImaging = (el.type === "lens" || isReflective);
+    const prevHeightIn = heightIn;
+    heightScale *= m;
+    const newObjX = direction === 1 ? (el.x + vLocal) : (el.x - vLocal);
+    const newImageHeight = heightScale*ho;
+
+    legs.push({ x: el.x, heightIn: prevHeightIn, imageX: newObjX, imageHeight: newImageHeight, type: el.type });
+
+    if (prismBlocked){
+      blockedAt = el.x;
+      objX = newObjX;
+      break;
+    }
+
+    objX = newObjX;
+    if (isImaging) lastVSign = isReflective ? (vLocal < 0) : (vLocal > 0);
+    if (isReflective) direction = -direction;
+    ptr += direction;
+
+    if (direction === 1 ? ptr < sorted.length : ptr >= 0){
+      const nextEl = sorted[ptr];
+      const denomX = (newObjX - el.x) || 1e-6;
+      heightIn = prevHeightIn + (newImageHeight - prevHeightIn) * (nextEl.x - el.x) / denomX;
+    }
+  }
+  return { finalX: objX, heightScale, real: lastVSign, steps, legs, blockedAt };
+}
+
+RAY_SCENES["ray-optics/optical-bench"] = {
+  title: "Optical Bench",
+  subline: "Place lenses, mirrors and slabs along the bench. Each element re-images whatever came before it — real, virtual, or reflected.",
+  controls: [
+    { key:"u",  label:"Object position (x)",  min:0.5, max:BENCH_LENGTH, step:0.5, value:3,  suffix:" cm" },
+    { key:"ho", label:"Object height (h₀)",   min:4, max:20, step:1,   value:10, suffix:" cm" },
+  ],
+  isBench: true,
+  compute(p){
+    const els = benchState.elements.slice().sort((a,b)=>a.x-b.x);
+    const t = traceBench(p.u, p.ho, els);
+    return { ...t, els, ho: p.ho };
+  },
+  draw(p, r){
+    clear();
+    const scale = BENCH_SCALE, ox = BENCH_OX;
+    drawAxis(ox);
+    seg(ox, AXIS_Y, CW-20, AXIS_Y, "rgba(154,172,204,.35)", 1);
+    drawTicksFrom(ox, scale);
+    const toPix = (x)=> ox + clampAbs(x,400)*scale;
+    const toPixY = (h)=> AXIS_Y - clampAbs(h,60)*scale/6;
+    const objPix = ox + p.u*scale;
+    arrowMark(objPix, AXIS_Y - r.ho*scale/6, "#eaf1ff", false, "Object");
+    r.els.forEach((el)=>{
+      const ex = ox + el.x*scale;
+      const selected = benchState.selectedId === el.id;
+      if (el.type === "lens"){
+        seg(ex, AXIS_Y-70, ex, AXIS_Y+70, el.f>0?"#7cb8ff":"#ff9fa3", 3);
+        label(`f=${el.f}`, ex, AXIS_Y-78, el.f>0?"#7cb8ff":"#ff9fa3", "center", 11);
+      } else if (el.type === "mirror"){
+        ctx.save();
+        ctx.strokeStyle = el.f>0 ? "#7cb8ff" : "#ff9fa3"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(ex+ (el.f>0?55:-55), AXIS_Y, 60, el.f>0?deg2rad(150):deg2rad(-30), el.f>0?deg2rad(210):deg2rad(30)); ctx.stroke();
+        ctx.restore();
+        label(`mirror f=${el.f}`, ex, AXIS_Y-78, el.f>0?"#7cb8ff":"#ff9fa3", "center", 11);
+      } else if (el.type === "planeMirror"){
+        seg(ex, AXIS_Y-70, ex, AXIS_Y+70, "#9eff90", 3);
+        for (let yy=AXIS_Y-64; yy<=AXIS_Y+64; yy+=14){
+          seg(ex+2, yy, ex+10, yy+7, "rgba(158,255,144,.5)", 1.2);
+        }
+        label("plane mirror", ex, AXIS_Y-78, "#9eff90", "center", 11);
+      } else if (el.type === "prism"){
+        const sz = el.size || 1;
+        const a2 = deg2rad(el.A/2);
+        const apexPt = {x: ex, y: AXIS_Y - 42*sz};
+        const faceLen = 58*sz;
+        const leftDir  = {x:-Math.sin(a2), y:Math.cos(a2)};
+        const rightDir = {x: Math.sin(a2), y:Math.cos(a2)};
+        const baseL = vadd(apexPt, vscale(leftDir, faceLen));
+        const baseR = vadd(apexPt, vscale(rightDir, faceLen));
+        const nLeft  = vnorm({x:-leftDir.y, y: leftDir.x});
+        const nRight = vnorm({x: rightDir.y, y:-rightDir.x});
+
+        ctx.save();
+        ctx.strokeStyle = "#ffb162"; ctx.fillStyle = "rgba(255,177,98,.1)"; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(apexPt.x,apexPt.y); ctx.lineTo(baseL.x,baseL.y); ctx.lineTo(baseR.x,baseR.y);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+        label(`prism A=${el.A}°`, ex, apexPt.y-12, "#ffb162", "center", 11);
+
+        const P1 = vadd(apexPt, vscale(leftDir, faceLen*0.55));
+        const incomingOffset = rotate(nLeft, -el.i1);
+        const src = vadd(P1, vscale(incomingOffset, 34*sz));
+        rayArrow(src.x, src.y, P1.x, P1.y, "rgba(255,217,174,.85)", 1.5);
+        const dIn = vnorm(vsub(P1, src));
+        const nInward = {x:-nLeft.x, y:-nLeft.y};
+        const dRefr1 = vectorRefract(dIn, nInward, 1/el.n);
+        if (dRefr1){
+          const localGeo = { apex:apexPt, baseL, baseR, nLeft, nRight };
+          const path = tracePrismPath(el.n, dRefr1, P1, localGeo);
+          path.segments.forEach(s => rayArrow(s.from.x, s.from.y, s.to.x, s.to.y, "rgba(255,177,98,.9)", 1.5));
+          if (path.exitDir){
+            rayArrow(path.exitPoint.x, path.exitPoint.y, path.exitPoint.x+path.exitDir.x*26*sz, path.exitPoint.y+path.exitDir.y*26*sz, "rgba(158,255,144,.9)", 1.5);
+          }
+        }
+      } else if (el.type === "slab"){
+        ctx.fillStyle = "rgba(120,152,255,.12)";
+        ctx.fillRect(ex-8, AXIS_Y-70, 16, 140);
+        label(`slab n=${el.n}`, ex, AXIS_Y-78, "#9aaccc", "center", 11);
+      }
+      if (selected) seg(ex, AXIS_Y-90, ex, AXIS_Y+90, "#45e6d4", 1, [3,3]);
+    });
+
+    if (!r.els.length){
+      label("Add a lens, mirror or slab from the palette below to begin tracing.", 16, 30, "#9aaccc", "left", 13);
+      return;
+    }
+    if (!r.legs.length){
+      label("The object doesn't face any element from this position — move it or drag an element.", 16, 30, "#ffb162", "left", 12.5);
+      return;
+    }
+
+    const RAY_COLOR = "#45e6d4";
+    let fromPix = { x: objPix, y: toPixY(r.ho) };
+    for (let i = 0; i < r.legs.length; i++){
+      const leg = r.legs[i];
+      const legPix = { x: toPix(leg.x), y: toPixY(leg.heightIn) };
+      rayArrow(fromPix.x, fromPix.y, legPix.x, legPix.y, RAY_COLOR, 2);
+      if (i < r.legs.length - 1 || true){
+        dot(toPix(leg.imageX), toPixY(leg.imageHeight), "rgba(255,217,174,.6)", 2.5);
+      }
+      fromPix = legPix;
+    }
+    const lastLegType = r.legs[r.legs.length-1].type;
+    const lastIsImaging = (lastLegType === "lens" || lastLegType === "mirror" || lastLegType === "planeMirror");
+
+    if (r.blockedAt != null){
+      const stopPix = toPix(r.blockedAt);
+      dot(stopPix, fromPix.y, "#ff9fa3", 4);
+      label("Beam stops here — TIR at the prism", stopPix+10, fromPix.y-10, "#ff9fa3", "left", 12);
+    } else if (!lastIsImaging){
+      rayArrow(fromPix.x, fromPix.y, CW-10, fromPix.y, "#9eff90", 2);
+      label("No lens or mirror has imaged the object yet — the ray just continues.", 16, 30, "#9aaccc", "left", 12);
+    } else {
+      const finalPix = toPix(r.finalX);
+      const hiPix = toPixY(r.heightScale*r.ho);
+      if (r.real){
+        rayArrow(fromPix.x, fromPix.y, finalPix, hiPix, "#9eff90", 2.2);
+      } else {
+        const dirx = fromPix.x-finalPix, diry = fromPix.y-hiPix;
+        const len = Math.hypot(dirx,diry)||1;
+        rayArrow(fromPix.x, fromPix.y, fromPix.x+(dirx/len)*140, fromPix.y+(diry/len)*140, "#9eff90", 2.2);
+        seg(fromPix.x, fromPix.y, finalPix, hiPix, "#9eff90", 1.3, [5,4]);
+      }
+      arrowMark(finalPix, hiPix, r.real ? "#9eff90" : "#ffd9ae", !r.real, r.real ? "Final (real)" : "Final (virtual)");
+    }
+  }
+};
+
+/* ---------- 10. IMAGE VELOCITY (MOVING OBJECT & LENS/MIRROR) ---------- */
+const velSimState = {
+  active: true,
+  t: 0,
+  deviceX_lab: 460,       // Lab pixel coordinate of lens/mirror
+  groundOffset_px: 0,     // Ground ruler glide offset in device frame
+  particles: [],          // Dynamic motion streak particles
+  phase: 0                // Animation wave phase
+};
+
+RAY_SCENES["ray-optics/image-velocity"] = {
+  title: "Image Velocity (Moving Object & Lens/Mirror)",
+  subline: "Watch the object, image, and lens/mirror in continuous motion. Compare the Laboratory Ground Frame with the Device Frame.",
+  isAnimated: true,
+  controls: [
+    { key:"vObj",       label:"Object velocity (v_O)",      min:-60, max:60,  step:0.5, value:30,  suffix:" m/s" },
+    { key:"vLens",      label:"Lens/Mirror velocity (v_L)",  min:-60, max:60,  step:0.5, value:10,  suffix:" m/s" },
+    { key:"u",          label:"Object distance (u)",        min:10,  max:400, step:1,   value:160, suffix:" cm" },
+    { key:"f",          label:"Focal length (f)",           min:4,   max:150, step:1,   value:20,  suffix:" cm" },
+    { key:"simSpeed",   label:"Simulation speed",           min:0.2, max:3.0, step:0.1, value:1.0, suffix:"×" },
+    { key:"groundFrame",label:"Laboratory (ground) frame — watch lens move", type:"checkbox", value:false },
+    { key:"isLens",     label:"Treat as a lens (unchecked = mirror)",        type:"checkbox", value:false },
+    { key:"isDiverging",label:"Diverging (convex mirror / concave lens)",    type:"checkbox", value:true },
+  ],
+  presets: [
+    { label:"🚗 Rearview Mirror (Car approaching)", apply(p){
+        return { isLens:false, isDiverging:true, f:15, u:180, vLens:15, vObj:35, groundFrame:false };
+      }
+    },
+    { label:"🏎️ Overtaking vehicle (Mirror)", apply(p){
+        return { isLens:false, isDiverging:true, f:15, u:50, vLens:25, vObj:10, groundFrame:false };
+      }
+    },
+    { label:"🔬 Moving Lens & Object (Lab Frame)", apply(p){
+        return { isLens:true, isDiverging:false, f:25, u:120, vLens:10, vObj:-20, groundFrame:true };
+      }
+    },
+    { label:"🪞 Plane Mirror (v_I = 2·v_M − v_O)", apply(p){
+        return { isLens:false, isDiverging:true, f:150, u:80, vLens:10, vObj:0, groundFrame:true };
+      }
+    }
+  ],
+  reset(p){
+    velSimState.t = 0;
+    velSimState.deviceX_lab = 460;
+    velSimState.groundOffset_px = 0;
+    velSimState.particles = [];
+  },
+  update(dt, p){
+    if (!velSimState.active) return;
+    const timeScale = p.simSpeed || 1.0;
+    const effDt = dt * timeScale;
+    velSimState.t += effDt;
+    velSimState.phase = (velSimState.phase + effDt * 10) % 100;
+
+    // Relative speed: du/dt = v_L - v_O (in m/s -> cm/s: * 100)
+    // When v_O > v_L, du/dt is negative, meaning object distance u is decreasing (approaching).
+    const duDt_cm = (p.vLens - p.vObj) * 100;
+    let newU = p.u + duDt_cm * effDt * 0.08;
+
+    // Soft boundary bounce to keep simulation continuously running without glitching
+    if (newU < 14){
+      newU = 14;
+      p.vObj = -p.vObj;
+      syncControlUI('vObj', p.vObj);
+    } else if (newU > 360){
+      newU = 360;
+      p.vObj = -p.vObj;
+      syncControlUI('vObj', p.vObj);
+    }
+    p.u = Math.round(newU * 10) / 10;
+    syncControlUI('u', p.u);
+
+    // In Ground Frame, lens/mirror physically moves across the canvas:
+    const vLens_pxPerSec = p.vLens * 2.5;
+    velSimState.deviceX_lab += vLens_pxPerSec * effDt;
+    if (velSimState.deviceX_lab < 220){
+      velSimState.deviceX_lab = 220;
+      p.vLens = -p.vLens;
+      syncControlUI('vLens', p.vLens);
+    } else if (velSimState.deviceX_lab > CW - 220){
+      velSimState.deviceX_lab = CW - 220;
+      p.vLens = -p.vLens;
+      syncControlUI('vLens', p.vLens);
+    }
+
+    // In Device Frame, ground markings glide underneath:
+    velSimState.groundOffset_px = (velSimState.groundOffset_px - p.vLens * effDt * 30) % 1000;
+
+    // Update dynamic speed streak particles
+    for (let i = velSimState.particles.length - 1; i >= 0; i--){
+      const pt = velSimState.particles[i];
+      pt.x += pt.vx * effDt * 60;
+      pt.life -= effDt * 2.2;
+      if (pt.life <= 0) velSimState.particles.splice(i, 1);
+    }
+  },
+  compute(p){
+    if (p.u <= 0) throw new Error("Object distance must be positive.");
+    if (p.f <= 0) throw new Error("Focal length must be positive.");
+    const fSigned = p.isDiverging ? -p.f : p.f;
+
+    function vOf(uVal){
+      if (p.isLens){
+        const uSigned = -uVal;
+        const denom = 1/fSigned + 1/uSigned;
+        if (Math.abs(denom) < 1e-9) return Infinity;
+        return 1/denom;
+      } else {
+        const denom = 1/fSigned - 1/uVal;
+        if (Math.abs(denom) < 1e-9) return Infinity;
+        return 1/denom;
+      }
+    }
+
+    const v = vOf(p.u);
+    if (!isFinite(v)) throw new Error("Object sits at the focus — image forms at infinity, velocity undefined.");
+
+    const m = p.isLens ? -v/p.u : -v/p.u;
+    const mSq = m * m;
+
+    // Relative velocity of object with respect to device along +x:
+    const v_O_rel = p.vObj - p.vLens;
+
+    // Image velocity relative to device along +x:
+    // Lens:   v_{I/L} = + m² · v_{O/L}
+    // Mirror: v_{I/M} = - m² · v_{O/M}
+    const v_I_rel = p.isLens ? (mSq * v_O_rel) : (-mSq * v_O_rel);
+
+    // Image velocity in laboratory (ground) frame along +x:
+    // Lens:   v_{I,lab} = v_L + v_{I/L} = v_L + m²(v_O - v_L)
+    // Mirror: v_{I,lab} = v_M + v_{I/M} = (1 + m²)v_M - m² v_O
+    const v_I_lab = p.vLens + v_I_rel;
+
+    return {
+      v,
+      m,
+      mSq,
+      v_O_rel,
+      v_I_rel,
+      v_I_lab,
+      isVirtual: p.isLens ? (v < 0) : (v < 0)
+    };
+  },
+  draw(p, r){
+    clear();
+
+    const ox = p.groundFrame ? velSimState.deviceX_lab : 460;
+
+    const extentLeft = Math.max(p.u, 2*p.f) + 20;
+    const extentRight = Math.max(p.f*2, Math.abs(r.v)*1.4) + 20;
+    const scale = fitScale(extentLeft, extentRight, 400, CW-460-20);
+    const vScale = Math.max(scale, 1.2);
+
+    // --- 1. Background Ground Track / Bench ---
+    ctx.save();
+    if (!p.groundFrame){
+      ctx.strokeStyle = "rgba(120,152,255,.15)";
+      ctx.lineWidth = 1;
+      const tickStep = 24;
+      const gOffset = velSimState.groundOffset_px % tickStep;
+      for (let x = -tickStep + gOffset; x <= CW + tickStep; x += tickStep){
+        ctx.beginPath(); ctx.moveTo(x, AXIS_Y + 120); ctx.lineTo(x, AXIS_Y + 130); ctx.stroke();
+      }
+      label("◀ Ground track glides backward relative to moving lens/vehicle ▶", CW/2, AXIS_Y+146, "rgba(154,172,204,.5)", "center", 10.5);
+    } else {
+      ctx.strokeStyle = "rgba(120,152,255,.22)";
+      ctx.lineWidth = 1;
+      for (let x = 40; x <= CW - 40; x += 30){
+        ctx.beginPath(); ctx.moveTo(x, AXIS_Y + 120); ctx.lineTo(x, AXIS_Y + 130); ctx.stroke();
+      }
+      label("Laboratory Ground Benchmark (Fixed Coordinate Frame)", CW/2, AXIS_Y+146, "rgba(154,172,204,.5)", "center", 10.5);
+    }
+    ctx.restore();
+
+    drawAxis(ox);
+    drawTicks(ox, scale);
+
+    // --- 2. Motion particles emission ---
+    if (velSimState.active && Math.random() < 0.35){
+      if (Math.abs(p.vObj) > 1){
+        const objPixInit = ox - p.u * scale;
+        velSimState.particles.push({
+          x: objPixInit,
+          y: AXIS_Y - 14 + (Math.random()-0.5)*18,
+          vx: (p.vObj > 0 ? -1 : 1) * (1 + Math.random()*2),
+          life: 0.8,
+          color: "rgba(255,217,174,"
+        });
+      }
+      if (Math.abs(r.v_I_lab) > 0.5){
+        const imgPixInit = p.isLens ? ox + r.v*scale : ox - r.v*scale;
+        velSimState.particles.push({
+          x: imgPixInit,
+          y: AXIS_Y - clampAbs(r.m*16, 60)*vScale/6 + (Math.random()-0.5)*16,
+          vx: (r.v_I_lab > 0 ? -1 : 1) * Math.min(6, 0.8 + Math.abs(r.v_I_lab)*0.1),
+          life: 0.7,
+          color: "rgba(158,255,144,"
+        });
+      }
+    }
+
+    ctx.save();
+    velSimState.particles.forEach(pt=>{
+      ctx.fillStyle = pt.color + (pt.life*0.7) + ")";
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, Math.max(1, 3.5*pt.life), 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // --- 3. Draw Optical Element (Lens or Mirror) ---
+    ctx.save();
+    if (p.isLens){
+      if (p.isDiverging) drawBiconcaveLens(ox); else drawBiconvexLens(ox);
+      label(p.isDiverging?"Concave Lens":"Convex Lens", ox, AXIS_Y-130, "#7cb8ff", "center", 12.5);
+    } else {
+      if (p.isDiverging) drawConvexMirror(ox); else drawConcaveMirror(ox);
+      label(p.isDiverging?"Convex Mirror":"Concave Mirror", ox, AXIS_Y-138, "#7cb8ff", "center", 12.5);
+    }
+
+    if (p.groundFrame){
+      ctx.fillStyle = "#7cb8ff";
+      ctx.beginPath(); ctx.arc(ox-14, AXIS_Y+112, 5, 0, Math.PI*2); ctx.arc(ox+14, AXIS_Y+112, 5, 0, Math.PI*2); ctx.fill();
+      seg(ox-22, AXIS_Y+107, ox+22, AXIS_Y+107, "#7cb8ff", 2);
+
+      if (Math.abs(p.vLens) > 0.1){
+        const lDir = p.vLens > 0 ? 1 : -1;
+        const lArrLen = Math.min(50, 18 + Math.abs(p.vLens)*0.6);
+        rayArrow(ox, AXIS_Y-155, ox + lDir*lArrLen, AXIS_Y-155, "#7898ff", 2.2);
+        label(`v_L = ${fmt(p.vLens,1)} m/s`, ox + lDir*lArrLen/2, AXIS_Y-164, "#7898ff", "center", 10.5);
+      }
+    }
+    ctx.restore();
+
+    const fDist = p.f * scale;
+    if (p.isLens){
+      dot(ox - fDist, AXIS_Y, "#ffb162", 3); label("F", ox-fDist, AXIS_Y+16, "#ffb162", "center", 10);
+      dot(ox + fDist, AXIS_Y, "#ffb162", 3); label("F", ox+fDist, AXIS_Y+16, "#ffb162", "center", 10);
+    } else {
+      const fSign = p.isDiverging ? 1 : -1;
+      dot(ox + fSign*fDist, AXIS_Y, "#ffb162", 3); label("F", ox + fSign*fDist, AXIS_Y+16, "#ffb162", "center", 10);
+      dot(ox + 2*fSign*fDist, AXIS_Y, "#ffb162", 3); label("C", ox + 2*fSign*fDist, AXIS_Y+16, "#ffb162", "center", 10);
+    }
+
+    // --- 4. Draw Moving Object ---
+    const ho = 16, y1 = AXIS_Y - ho;
+    const objPix = ox - p.u*scale;
+    arrowMark(objPix, y1, "#eaf1ff", false, "Object");
+
+    const oVel = p.groundFrame ? p.vObj : r.v_O_rel;
+    if (Math.abs(oVel) > 0.1){
+      const objDir = oVel > 0 ? 1 : -1;
+      const objArrLen = Math.min(65, 20 + Math.abs(oVel)*0.8);
+      rayArrow(objPix, y1 - 22, objPix + objDir*objArrLen, y1 - 22, "#ffd9ae", 2.2);
+      label(`${fmt(oVel,1)} m/s`, objPix + objDir*objArrLen/2, y1 - 30, "#ffd9ae", "center", 10.5);
+    }
+
+    if (Math.abs(oVel) > 2){
+      const streakDir = oVel > 0 ? -1 : 1;
+      const streakLen = Math.min(45, Math.abs(oVel)*0.9);
+      seg(objPix, y1+4, objPix + streakDir*streakLen, y1+4, "rgba(255,217,174,.4)", 1.5, [4,3]);
+      seg(objPix, AXIS_Y-4, objPix + streakDir*streakLen*0.7, AXIS_Y-4, "rgba(255,217,174,.25)", 1.2, [3,3]);
+    }
+
+    // --- 5. Draw Image ---
+    const isVirt = r.isVirtual;
+    const imgPix = p.isLens ? ox + r.v*scale : ox - r.v*scale;
+    const imgY = AXIS_Y - clampAbs(r.m*ho, 60)*vScale/6;
+
+    rayArrow(objPix, y1, ox, y1, "#45e6d4", 1.8);
+    if (!isVirt){
+      rayArrow(ox, y1, imgPix, imgY, "#9eff90", 1.8);
+    } else {
+      const dirx = ox - imgPix, diry = y1 - imgY;
+      const len = Math.hypot(dirx,diry) || 1;
+      rayArrow(ox, y1, ox + (dirx/len)*240, y1 + (diry/len)*240, "#45e6d4", 1.6);
+      seg(ox, y1, imgPix, imgY, "#9eff90", 1.4, [5,4]);
+    }
+
+    arrowMark(imgPix, imgY, "#9eff90", isVirt, isVirt ? "Virtual Image" : "Real Image");
+
+    const iVel = p.groundFrame ? r.v_I_lab : r.v_I_rel;
+    if (Math.abs(iVel) > 0.05){
+      const imgDir = iVel > 0 ? 1 : -1;
+      const imgArrLen = Math.min(75, 20 + Math.abs(iVel)*1.2);
+      rayArrow(imgPix, imgY - 20, imgPix + imgDir*imgArrLen, imgY - 20, "#9eff90", 2.2);
+      label(`${fmt(iVel,2)} m/s`, imgPix + imgDir*imgArrLen/2, imgY - 28, "#9eff90", "center", 10.5);
+    }
+
+    if (Math.abs(iVel) > 0.5){
+      const streakDir = iVel > 0 ? -1 : 1;
+      const streakLen = Math.min(65, 8 + Math.abs(iVel)*2.2);
+      seg(imgPix, imgY+4, imgPix + streakDir*streakLen, imgY+4, "rgba(158,255,144,.55)", 1.8, [4,3]);
+      seg(imgPix, AXIS_Y-4, imgPix + streakDir*streakLen*0.6, AXIS_Y-4, "rgba(158,255,144,.3)", 1.4, [3,3]);
+    }
+
+    // --- 6. Status Badges & Live Overlay ---
+    const frameName = p.groundFrame ? "LABORATORY (GROUND) FRAME" : "DEVICE FRAME (LENS/MIRROR AT REST)";
+    label(`ACTIVE FRAME: ${frameName}`, 14, 26, "#cfe0ff", "left", 12.5);
+    label(`u(t) = ${fmt(p.u,1)} cm   v(t) = ${fmt(r.v,2)} cm   m = ${fmt(r.m,3)}   m² = ${fmt(r.mSq,4)}`, 14, 46, "#9aaccc", "left", 11.5);
+
+    const devType = p.isLens ? "Lens" : "Mirror";
+    const relRel = p.isLens ? `v_{I/L} = +m² · v_{O/L}` : `v_{I/M} = −m² · v_{O/M}`;
+    label(`JEE Law: ${relRel}  ⟶  v_{image,lab} = ${fmt(r.v_I_lab,3)} m/s`, 14, CH-14, "#9eff90", "left", 11.5);
+  }
+};
+
+const UNITS = [
+  { unit:"Mechanics", chapters:[
+    { name:"Units & Measurements", subtopics:[
+      {name:"Errors & Significant Figures", live:false}, {name:"Dimensional Analysis", live:false} ]},
+    { name:"Kinematics", subtopics:[
+      {name:"Projectile Motion", live:false}, {name:"Relative Velocity", live:false}, {name:"Motion in a Straight Line", live:false} ]},
+    { name:"Laws of Motion", subtopics:[
+      {name:"Friction on Incline", live:false}, {name:"Pulley Systems", live:false}, {name:"Circular Motion Dynamics", live:false} ]},
+    { name:"Work, Energy & Power", subtopics:[
+      {name:"Spring-Block Energy", live:false}, {name:"Collisions (1D/2D)", live:false} ]},
+    { name:"Rotational Motion", subtopics:[
+      {name:"Moment of Inertia Builder", live:false}, {name:"Rolling Without Slipping", live:false} ]},
+    { name:"Gravitation", subtopics:[
+      {name:"Orbital Mechanics", live:false}, {name:"Escape Velocity", live:false} ]},
+    { name:"Mechanical Properties of Matter", subtopics:[
+      {name:"Stress-Strain Curve", live:false}, {name:"Fluid Pressure & Buoyancy", live:false}, {name:"Viscosity & Terminal Velocity", live:false} ]},
+  ]},
+  { unit:"Thermal Physics", chapters:[
+    { name:"Thermal Properties of Matter", subtopics:[ {name:"Calorimetry", live:false}, {name:"Heat Transfer Modes", live:false} ]},
+    { name:"Kinetic Theory of Gases", subtopics:[ {name:"Maxwell-Boltzmann Distribution", live:false} ]},
+    { name:"Thermodynamics", subtopics:[ {name:"PV Cycles & Engines", live:false}, {name:"First Law Processes", live:false} ]},
+  ]},
+  { unit:"Oscillations & Waves", chapters:[
+    { name:"Oscillations", subtopics:[ {name:"Simple Harmonic Motion", live:false}, {name:"Damped & Forced Oscillations", live:false} ]},
+    { name:"Waves", subtopics:[ {name:"Standing Waves on a String", live:false}, {name:"Beats & Doppler Effect", live:false} ]},
+  ]},
+  { unit:"Electricity & Magnetism", chapters:[
+    { name:"Electrostatics", subtopics:[ {name:"Field Lines & Equipotentials", live:false}, {name:"Gauss's Law Visualizer", live:false} ]},
+    { name:"Current Electricity", subtopics:[ {name:"Wheatstone Bridge", live:false}, {name:"RC Charging/Discharging", live:false} ]},
+    { name:"Moving Charges & Magnetism", subtopics:[ {name:"Charged Particle in B-Field", live:false}, {name:"Force on Current-Carrying Wire", live:false} ]},
+    { name:"Electromagnetic Induction & AC", subtopics:[ {name:"Faraday's Law — Moving Rod", live:false}, {name:"LCR Series Circuit Phasors", live:false} ]},
+    { name:"Electromagnetic Waves", subtopics:[ {name:"EM Spectrum Explorer", live:false} ]},
+  ]},
+  { unit:"Optics", chapters:[
+    { name:"Ray Optics", subtopics:[
+      {name:"Convex Lens", live:true, sceneId:"ray-optics/convex-lens"},
+      {name:"Concave Lens", live:true, sceneId:"ray-optics/concave-lens"},
+      {name:"Concave Mirror", live:true, sceneId:"ray-optics/concave-mirror"},
+      {name:"Convex Mirror", live:true, sceneId:"ray-optics/convex-mirror"},
+      {name:"Total Internal Reflection", live:true, sceneId:"ray-optics/tir"},
+      {name:"Prism Dispersion", live:true, sceneId:"ray-optics/prism"},
+      {name:"Glass Slab", live:true, sceneId:"ray-optics/glass-slab"},
+      {name:"Lens + Slab Shift", live:true, sceneId:"ray-optics/lens-slab-shift"},
+      {name:"Lens Combination", live:true, sceneId:"ray-optics/lens-combination"},
+      {name:"Plane Mirror", live:true, sceneId:"ray-optics/plane-mirror"},
+      {name:"Snell's Window", live:true, sceneId:"ray-optics/snells-window"},
+      {name:"Optical Bench", live:true, sceneId:"ray-optics/optical-bench"},
+      {name:"Image Velocity (Moving Object)", live:true, sceneId:"ray-optics/image-velocity"},
+    ]},
+    { name:"Wave Optics", subtopics:[ {name:"Young's Double Slit", live:false}, {name:"Diffraction Grating", live:false}, {name:"Polarization", live:false} ]},
+  ]},
+  { unit:"Modern Physics", chapters:[
+    { name:"Dual Nature of Matter", subtopics:[ {name:"Photoelectric Effect", live:false}, {name:"de Broglie Wavelength", live:false} ]},
+    { name:"Atoms & Nuclei", subtopics:[ {name:"Bohr Model", live:false}, {name:"Radioactive Decay Curve", live:false} ]},
+    { name:"Semiconductor Electronics", subtopics:[ {name:"p-n Junction & Diode I-V", live:false}, {name:"Logic Gates", live:false} ]},
+  ]},
+];
+const ALL_CARDS = [];
+UNITS.forEach(u => u.chapters.forEach(c => c.subtopics.forEach(s => {
+  ALL_CARDS.push({ unit:u.unit, chapter:c.name, name:s.name, live:s.live, sceneId:s.sceneId || null });
+})));
+
+/* =========================================================================
+   5. CATALOG RENDERING / FILTERING
+   ========================================================================= */
+let activeUnit = "All";
+const unitBar = document.getElementById('unitBar');
+["All", ...UNITS.map(u=>u.unit)].forEach(name=>{
+  const btn = document.createElement('button');
+  btn.className = 'chapter-btn' + (name==="All" ? ' active':'');
+  btn.textContent = name; btn.dataset.unit = name;
+  btn.addEventListener('click', ()=>{
+    activeUnit = name;
+    document.querySelectorAll('.chapter-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    renderCatalog();
+  });
+  unitBar.appendChild(btn);
+});
+document.getElementById('searchInput').addEventListener('input', renderCatalog);
+
+function renderCatalog(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const filtered = ALL_CARDS.filter(c =>
+    (activeUnit==="All" || c.unit===activeUnit) &&
+    (c.name.toLowerCase().includes(q) || c.chapter.toLowerCase().includes(q))
+  );
+  document.getElementById('resultCount').textContent = filtered.length;
+  document.getElementById('liveCount').textContent = ALL_CARDS.filter(c=>c.live).length;
+  document.getElementById('emptyState').style.display = filtered.length ? 'none':'block';
+
+  filtered.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = `chapter-card ${c.live?'live':'soon'}`;
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="unit-label">${c.chapter}</span>
+        <span class="pill ${c.live?'live':'soon'}">${c.live?'LIVE':'SOON'}</span>
+      </div>
+      <strong>${c.name}</strong>
+      <div class="chip-row"><span class="concept-chip">${c.unit}</span></div>
+      <div class="card-bottom"><span>${c.chapter}</span><span>${c.live?'Open →':'—'}</span></div>
+    `;
+    if (c.live && RAY_SCENES[c.sceneId]) card.addEventListener('click', ()=>openScene(c.sceneId));
+    grid.appendChild(card);
+  });
+}
+renderCatalog();
+
+/* =========================================================================
+   6. LAB VIEW WIRING & ANIMATION LOOP
+   ========================================================================= */
+const canvas = document.getElementById('scene');
+ctx = canvas.getContext('2d');
+let currentSceneId = null, currentParams = {};
+let animFrameId = null, lastAnimTime = 0;
+const controlRefs = {};
+
+function syncControlUI(key, value){
+  const ref = controlRefs[key];
+  if (!ref) return;
+  if (ref.cb){
+    ref.cb.checked = !!value;
+  } else {
+    if (value > parseFloat(ref.rangeEl.max)) ref.rangeEl.max = value;
+    if (value < parseFloat(ref.rangeEl.min)) ref.rangeEl.min = value;
+    ref.rangeEl.value = value;
+    ref.numEl.value = typeof value === 'number' ? Math.round(value*100)/100 : value;
+  }
+}
+
+function startAnimLoop(){
+  if (animFrameId) return;
+  lastAnimTime = performance.now();
+  function tick(now){
+    const dt = Math.min(0.1, (now - lastAnimTime)/1000);
+    lastAnimTime = now;
+    const scene = RAY_SCENES[currentSceneId];
+    if (scene && scene.update && velSimState.active){
+      try {
+        scene.update(dt, currentParams);
+        renderScene();
+      } catch (e){
+        console.error(e);
+      }
+    }
+    if (animFrameId !== null){
+      animFrameId = requestAnimationFrame(tick);
+    }
+  }
+  animFrameId = requestAnimationFrame(tick);
+}
+
+function stopAnimLoop(){
+  if (animFrameId !== null){
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+}
+
+function buildControlRow(container, cfg, initialValue, onChange){
+  const div = document.createElement('div'); div.className = 'control';
+  div.innerHTML = `
+    <label><span>${cfg.label}</span></label>
+    <div class="control-row">
+      <input type="range" class="ctl-range" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${initialValue}">
+      <input type="number" class="ctl-number" step="${cfg.step}" value="${initialValue}">
+      <span class="ctl-suffix">${(cfg.suffix||'').trim()}</span>
+    </div>`;
+  container.appendChild(div);
+  const rangeEl = div.querySelector('.ctl-range');
+  const numEl = div.querySelector('.ctl-number');
+  rangeEl.addEventListener('input', ()=>{
+    const v = parseFloat(rangeEl.value);
+    numEl.value = v;
+    onChange(v);
+  });
+  numEl.addEventListener('input', ()=>{
+    const v = parseFloat(numEl.value);
+    if (!isFinite(v)) return;
+    if (v > parseFloat(rangeEl.max)) rangeEl.max = v;
+    if (v < parseFloat(rangeEl.min)) rangeEl.min = v;
+    rangeEl.value = v;
+    onChange(v);
+  });
+  return { rangeEl, numEl };
+}
+
+function buildCheckboxRow(container, cfg, initialValue, onChange){
+  const div = document.createElement('div'); div.className = 'control checkbox-row';
+  div.innerHTML = `<label style="display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:0">
+    <input type="checkbox" ${initialValue?'checked':''} style="width:15px;height:15px;accent-color:var(--cyan)">
+    <span>${cfg.label}</span>
+  </label>`;
+  container.appendChild(div);
+  const cb = div.querySelector('input');
+  cb.addEventListener('change', ()=> onChange(cb.checked));
+  return { cb };
+}
+
+function openScene(id){
+  stopAnimLoop();
+  const scene = RAY_SCENES[id];
+  if (!scene) return;
+  currentSceneId = id;
+  currentParams = {};
+  scene.controls.forEach(c => currentParams[c.key] = c.value);
+
+  document.getElementById('catalogView').style.display = 'none';
+  document.getElementById('labView').style.display = 'block';
+  document.getElementById('labTitle').textContent = scene.title;
+  document.getElementById('labSubline').textContent = scene.subline;
+  document.getElementById('labWarning').classList.remove('show');
+
+  const controlPanel = document.getElementById('controlPanel');
+  controlPanel.innerHTML = '';
+  for (const k in controlRefs) delete controlRefs[k];
+
+  scene.controls.forEach(c=>{
+    if (c.type === 'checkbox'){
+      controlRefs[c.key] = buildCheckboxRow(controlPanel, c, c.value, (v)=>{
+        currentParams[c.key] = v;
+        renderScene();
+      });
+    } else {
+      controlRefs[c.key] = buildControlRow(controlPanel, c, c.value, (v)=>{
+        currentParams[c.key] = v;
+        renderScene();
+      });
+    }
+  });
+
+  if (scene.presets && scene.presets.length){
+    const presetRow = document.createElement('div');
+    presetRow.className = 'mini-row';
+    presetRow.style.marginTop = '4px';
+    scene.presets.forEach(preset=>{
+      const btn = document.createElement('button');
+      btn.className = 'mini-btn';
+      btn.textContent = preset.label;
+      btn.addEventListener('click', ()=>{
+        const updates = preset.apply(currentParams);
+        if (!updates){
+          document.getElementById('labWarning').textContent = preset.unreachableMessage || "That configuration isn't reachable with the current settings.";
+          document.getElementById('labWarning').classList.add('show');
+          return;
+        }
+        document.getElementById('labWarning').classList.remove('show');
+        Object.keys(updates).forEach(key=>{
+          currentParams[key] = updates[key];
+          syncControlUI(key, updates[key]);
+        });
+        renderScene();
+      });
+      presetRow.appendChild(btn);
+    });
+    controlPanel.appendChild(presetRow);
+  }
+
+  const playbackBar = document.getElementById('playbackBar');
+  if (scene.isAnimated){
+    playbackBar.style.display = 'flex';
+    velSimState.active = true;
+    updatePlayBtnState();
+    if (scene.reset) scene.reset(currentParams);
+    startAnimLoop();
+  } else {
+    playbackBar.style.display = 'none';
+  }
+
+  const benchWrap = document.getElementById('benchPaletteWrap');
+  const benchListCard = document.getElementById('benchListCard');
+  const benchEditorCard = document.getElementById('benchEditorCard');
+  if (scene.isBench){
+    benchWrap.style.display = 'block';
+    benchListCard.style.display = 'block';
+    benchState.selectedId = null;
+    setupBenchUI();
+  } else {
+    benchWrap.style.display = 'none';
+    benchListCard.style.display = 'none';
+    benchEditorCard.style.display = 'none';
+  }
+
+  renderScene();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updatePlayBtnState(){
+  const btn = document.getElementById('playToggleBtn');
+  if (velSimState.active){
+    btn.textContent = '❚❚ Pause';
+    btn.classList.remove('paused');
+  } else {
+    btn.textContent = '▶ Play';
+    btn.classList.add('paused');
+  }
+}
+
+document.getElementById('playToggleBtn').addEventListener('click', ()=>{
+  velSimState.active = !velSimState.active;
+  updatePlayBtnState();
+  if (velSimState.active) startAnimLoop();
+});
+
+document.getElementById('resetAnimBtn').addEventListener('click', ()=>{
+  const scene = RAY_SCENES[currentSceneId];
+  if (scene && scene.reset) scene.reset(currentParams);
+  renderScene();
+});
+
+document.getElementById('reverseVelBtn').addEventListener('click', ()=>{
+  if (currentParams.vObj !== undefined){
+    currentParams.vObj = -currentParams.vObj;
+    syncControlUI('vObj', currentParams.vObj);
+  }
+  if (currentParams.vLens !== undefined){
+    currentParams.vLens = -currentParams.vLens;
+    syncControlUI('vLens', currentParams.vLens);
+  }
+  renderScene();
+});
+
+function renderScene(){
+  const scene = RAY_SCENES[currentSceneId];
+  if (!scene) return;
+  let readout;
+  try {
+    readout = scene.compute(currentParams);
+  } catch (err){
+    document.getElementById('labWarning').textContent = 'Calculation error: ' + err.message;
+    document.getElementById('labWarning').classList.add('show');
+    return;
+  }
+  document.getElementById('labWarning').classList.remove('show');
+  try {
+    scene.draw(currentParams, readout);
+  } catch (err){
+    document.getElementById('labWarning').textContent = 'Draw error: ' + err.message;
+    document.getElementById('labWarning').classList.add('show');
+  }
+  renderReadout(scene, readout);
+}
+
+function renderReadout(scene, r){
+  const panel = document.getElementById('readoutPanel');
+  panel.innerHTML = '';
+  const rows = [];
+  if (currentSceneId === 'ray-optics/convex-lens'){
+    rows.push(['Image distance (v)', r.infinite ? '∞' : fmt(r.v,2)+' cm']);
+    rows.push(['Magnification (m)', r.infinite ? '∞' : fmt(r.m,2)]);
+    rows.push(['Nature', r.infinite ? '—' : (r.v>0 ? 'Real, ' + (r.m<0?'inverted':'erect') : 'Virtual, erect'), r.infinite?'':(r.v>0?'good':'')]);
+  } else if (currentSceneId === 'ray-optics/concave-lens'){
+    rows.push(['Image distance (v)', fmt(r.v,2)+' cm']);
+    rows.push(['Magnification (m)', fmt(r.m,2), 'good']);
+    rows.push(['Nature', 'Virtual, erect, diminished']);
+  } else if (currentSceneId === 'ray-optics/concave-mirror'){
+    rows.push(['Image distance (v)', r.infinite ? '∞' : fmt(r.v,2)+' cm']);
+    rows.push(['Magnification (m)', r.infinite ? '∞' : fmt(r.m,2)]);
+    rows.push(['Nature', r.infinite ? '—' : (r.v>0 ? 'Real, ' + (r.m<0?'inverted':'erect') : 'Virtual, erect')]);
+  } else if (currentSceneId === 'ray-optics/convex-mirror'){
+    rows.push(['Image distance (v)', fmt(r.v,2)+' cm']);
+    rows.push(['Magnification (m)', fmt(r.m,2), 'good']);
+    rows.push(['Nature', 'Virtual, erect, diminished']);
+  } else if (currentSceneId === 'ray-optics/tir'){
+    rows.push(['Critical angle', r.critical.toFixed(2)+'°']);
+    rows.push(['Status', r.isTIR ? 'Total internal reflection' : 'Refracts out', r.isTIR?'good':'']);
+    if (!r.isTIR) rows.push(['Refraction angle', r.exitAngle.toFixed(2)+'°']);
+  } else if (currentSceneId === 'ray-optics/prism'){
+    rows.push(['r₁', r.r1.toFixed(2)+'°']);
+    rows.push(['r₂', r.r2.toFixed(2)+'°']);
+    if (r.tirAtSecond){
+      rows.push(['Status', 'TIR at 2nd face', 'bad']);
+    } else {
+      rows.push(['i₂', r.i2.toFixed(2)+'°']);
+      rows.push(['Deviation (δ)', r.delta.toFixed(2)+'°', 'good']);
+    }
+    rows.push(['δ (minimum, symmetric)', r.deltaMin.toFixed(2)+'°']);
+    rows.push(['δ (grazing emergence)', r.deltaGrazing!=null ? r.deltaGrazing.toFixed(2)+'°' : 'not reachable']);
+  } else if (currentSceneId === 'ray-optics/glass-slab'){
+    rows.push(['Refraction angle (r)', r.r.toFixed(2)+'°']);
+    rows.push(['Lateral shift', r.shift.toFixed(2)+' cm', 'good']);
+  } else if (currentSceneId === 'ray-optics/lens-slab-shift'){
+    rows.push(['Focal length (f)', fmt(r.f,2)+' cm']);
+    rows.push(['Apparent shift from slab (δ)', fmt(r.delta,3)+' cm']);
+    rows.push(['New image distance needed (v′)', fmt(r.vPrime,2)+' cm']);
+    rows.push(['New object distance (u′)', fmt(r.uPrime,2)+' cm']);
+    rows.push(['Object shift required', fmt(Math.abs(r.shift),2)+' cm', 'good']);
+    document.getElementById('stepsCard').style.display = 'block';
+    document.getElementById('stepsPanel').textContent =
+`1) Find f from the original setup (object at u, image at the screen, v):
+   1/f = 1/v + 1/u = 1/${currentParams.v} + 1/${currentParams.u}
+   f = ${fmt(r.f,2)} cm
+
+2) Apparent shift caused by the slab:
+   δ = t(1 − 1/n) = ${currentParams.t} × (1 − 1/${currentParams.n})
+   δ = ${fmt(r.delta,3)} cm
+
+3) The lens must now form its own image δ closer to itself, so that
+   after the slab shift it still lands exactly on the fixed screen:
+   v′ = v − δ = ${currentParams.v} − ${fmt(r.delta,3)} = ${fmt(r.vPrime,3)} cm
+
+4) Solve the lens formula for the new object distance:
+   1/u′ = 1/f − 1/v′  →  u′ = ${fmt(r.uPrime,2)} cm
+
+5) Required shift = |u′ − u| = ${fmt(Math.abs(r.shift),2)} cm
+   (move the object ${r.shift>0?'away from':'toward'} the lens)`;
+  } else if (currentSceneId === 'ray-optics/image-velocity'){
+    const dev = currentParams.isLens ? 'Lens' : 'Mirror';
+    rows.push(['Active Reference Frame', currentParams.groundFrame ? 'Laboratory (Ground) Frame' : 'Device Frame ('+dev+' at Rest)']);
+    rows.push(['Object Velocity (Ground)', fmt(currentParams.vObj,1)+' m/s']);
+    rows.push([dev+' Velocity (Ground)', fmt(currentParams.vLens,1)+' m/s']);
+    rows.push(['Relative Object Velocity (v_O/dev)', fmt(r.v_O_rel,2)+' m/s']);
+    rows.push(['Magnification m', fmt(r.m,4)]);
+    rows.push(['Magnification squared (m²)', fmt(r.mSq,5)]);
+    rows.push(['Image Velocity rel. to '+dev, fmt(r.v_I_rel,3)+' m/s', 'good']);
+    rows.push(['Image Velocity in Ground Frame', fmt(r.v_I_lab,3)+' m/s', 'good']);
+    rows.push(['Image Distance v(t)', fmt(r.v,2)+' cm']);
+    rows.push(['Nature', r.isVirtual ? 'Virtual' : 'Real']);
+
+    document.getElementById('stepsCard').style.display = 'block';
+    const relSign = currentParams.isLens ? '+' : '−';
+    document.getElementById('stepsPanel').textContent =
+`=== JEE MAIN & ADVANCED FORMULATION ===
+1) Longitudinal differentiation of the ${dev.toLowerCase()} formula:
+   ${currentParams.isLens ? '1/v − 1/u_signed = 1/f' : '1/v + 1/u_signed = 1/f'}
+   ⟶ v_{image/device} = ${relSign} m² × v_{object/device}
+
+2) Relative velocities along +x (principal axis):
+   v_{O/device} = v_O − v_${dev === 'Lens' ? 'L' : 'M'}
+                = (${fmt(currentParams.vObj,1)}) − (${fmt(currentParams.vLens,1)})
+                = ${fmt(r.v_O_rel,2)} m/s
+
+3) Magnification:
+   m = ${fmt(r.m,4)}   ⟶   m² = ${fmt(r.mSq,5)}
+
+4) Velocity of image relative to ${dev.toLowerCase()}:
+   v_{I/device} = ${relSign}(${fmt(r.mSq,4)}) × (${fmt(r.v_O_rel,2)})
+                = ${fmt(r.v_I_rel,3)} m/s
+
+5) Final image velocity in Laboratory Ground Frame:
+   v_{I,lab} = v_${dev === 'Lens' ? 'L' : 'M'} + v_{I/device}
+             = (${fmt(currentParams.vLens,1)}) + (${fmt(r.v_I_rel,3)})
+             = ${fmt(r.v_I_lab,3)} m/s`;
+  } else if (currentSceneId === 'ray-optics/lens-combination'){
+    rows.push(['v₁ (lens 1)', isFinite(r.v1)?fmt(r.v1,2)+' cm':'∞']);
+    rows.push(['u₂ (for lens 2)', isFinite(r.u2)?fmt(r.u2,2)+' cm':'∞']);
+    rows.push(['v₂ (final, from lens 2)', isFinite(r.v2)?fmt(r.v2,2)+' cm':'∞']);
+    rows.push(['Total magnification', isFinite(r.mTotal)?fmt(r.mTotal,3):'∞', 'good']);
+  } else if (currentSceneId === 'ray-optics/plane-mirror'){
+    rows.push(['Image distance (v)', fmt(r.v,2)+' cm behind mirror']);
+    rows.push(['Magnification', '+1.00 (same size)', 'good']);
+    rows.push(['Nature', 'Virtual, erect']);
+  } else if (currentSceneId === 'ray-optics/snells-window'){
+    rows.push(['Critical angle', r.critical.toFixed(2)+'°']);
+    rows.push(['Window diameter', (2*r.windowRadius).toFixed(2)+' m', 'good']);
+  } else if (currentSceneId === 'ray-optics/optical-bench'){
+    rows.push(['Elements on bench', String(r.els.length)]);
+    const lastType = r.legs && r.legs.length ? r.legs[r.legs.length-1].type : null;
+    const lastIsImaging = lastType === 'lens' || lastType === 'mirror' || lastType === 'planeMirror';
+    if (r.blockedAt != null){
+      rows.push(['Beam status', `Blocked by TIR at x=${fmt(r.blockedAt,1)}cm`, 'bad']);
+      rows.push(['Nature', '— (no emergent ray)']);
+    } else if (!r.els.length){
+      rows.push(['Final image position', '—']);
+      rows.push(['Nature', '—']);
+    } else if (!lastIsImaging){
+      rows.push(['Beam status', 'Passes through — not yet imaged by a lens or mirror']);
+      rows.push(['Nature', r.real ? 'Real (unchanged)' : 'Virtual (unchanged)']);
+    } else {
+      rows.push(['Final image position', fmt(r.finalX,2)+' cm', 'good']);
+      rows.push(['Nature', r.real?'Real':'Virtual', 'good']);
+    }
+    document.getElementById('stepsCard').style.display = 'block';
+    document.getElementById('stepsPanel').textContent = r.steps.length ? r.steps.join('\n') : 'Add an element to see the trace.';
+  }
+  if (!['ray-optics/optical-bench','ray-optics/lens-slab-shift','ray-optics/image-velocity'].includes(currentSceneId)){
+    document.getElementById('stepsCard').style.display = 'none';
+  }
+
+  rows.forEach(([k,v,cls])=>{
+    const row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = `<span>${k}</span><b class="${cls||''}">${v}</b>`;
+    panel.appendChild(row);
+  });
+}
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  stopAnimLoop();
+  document.getElementById('labView').style.display = 'none';
+  document.getElementById('catalogView').style.display = 'block';
+  currentSceneId = null;
+});
+
+/* ---- Bench-specific UI ---- */
+const BENCH_TOOLS = [
+  { id:"lensConv",    label:"➕ Convex lens",     type:"lens",        f:8 },
+  { id:"lensDiv",     label:"➕ Concave lens",    type:"lens",        f:-8 },
+  { id:"mirrorConc",  label:"➕ Concave mirror",  type:"mirror",      f:10 },
+  { id:"mirrorConv",  label:"➕ Convex mirror",   type:"mirror",      f:-10 },
+  { id:"planeMirror", label:"➕ Plane mirror",    type:"planeMirror" },
+  { id:"slab",        label:"➕ Glass slab",      type:"slab",        thickness:3, n:1.5 },
+  { id:"prism",       label:"➕ Prism",           type:"prism",       A:60, n:1.5, i1:45, size:1 },
+];
+function benchPixelToWorld(clientX){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = CW/rect.width;
+  const pixelX = (clientX - rect.left)*scaleX;
+  let worldX = (pixelX-BENCH_OX)/BENCH_SCALE;
+  return Math.max(0.5, Math.min(BENCH_LENGTH, worldX));
+}
+
+function setupBenchUI(){
+  const pal = document.getElementById('benchPalette');
+  pal.innerHTML = '';
+  BENCH_TOOLS.forEach(tool=>{
+    const chip = document.createElement('div');
+    chip.className = 'bench-chip' + (benchState.activeTool===tool.id ? ' active':'');
+    chip.textContent = tool.label;
+    chip.addEventListener('click', ()=>{
+      benchState.activeTool = tool.id;
+      setupBenchUI();
+    });
+    pal.appendChild(chip);
+  });
+  renderBenchList();
+  renderBenchEditor();
+
+  canvas.onmousedown = (e)=>{
+    if (currentSceneId !== 'ray-optics/optical-bench') return;
+    const worldX = benchPixelToWorld(e.clientX);
+    const near = benchState.elements.find(el => Math.abs(el.x-worldX) < 1.2);
+    if (near){
+      benchState.selectedId = near.id;
+      benchState.draggingId = near.id;
+      renderBenchList(); renderBenchEditor(); renderScene();
+      return;
+    }
+    const tool = BENCH_TOOLS.find(t=>t.id===benchState.activeTool);
+    const el = { id: benchState.nextId++, type: tool.type, x: worldX };
+    if (tool.type === 'lens' || tool.type === 'mirror') el.f = tool.f;
+    if (tool.type === 'slab'){ el.thickness = tool.thickness; el.n = tool.n; }
+    if (tool.type === 'prism'){ el.A = tool.A; el.n = tool.n; el.i1 = tool.i1; el.size = tool.size; }
+    benchState.elements.push(el);
+    benchState.selectedId = el.id;
+    renderBenchList(); renderBenchEditor(); renderScene();
+  };
+  canvas.onmousemove = (e)=>{
+    if (currentSceneId !== 'ray-optics/optical-bench' || benchState.draggingId == null) return;
+    const el = benchState.elements.find(e2=>e2.id===benchState.draggingId);
+    if (!el) return;
+    el.x = Math.round(benchPixelToWorld(e.clientX)*2)/2;
+    renderBenchList(); renderBenchEditor(); renderScene();
+  };
+  window.addEventListener('mouseup', ()=>{ benchState.draggingId = null; });
+
+  document.getElementById('benchClearBtn').onclick = ()=>{
+    benchState.elements = []; benchState.selectedId = null;
+    renderBenchList(); renderBenchEditor(); renderScene();
+  };
+  document.getElementById('benchExampleBtn').onclick = ()=>{
+    benchState.elements = [
+      { id: benchState.nextId++, type:'lens', x:12, f:8 },
+      { id: benchState.nextId++, type:'lens', x:26, f:-8 },
+    ];
+    benchState.selectedId = null;
+    renderBenchList(); renderBenchEditor(); renderScene();
+  };
+}
+
+function renderBenchList(){
+  const wrap = document.getElementById('benchElements');
+  wrap.innerHTML = '';
+  benchState.elements.slice().sort((a,b)=>a.x-b.x).forEach(el=>{
+    const row = document.createElement('div');
+    row.className = 'bench-el-row' + (benchState.selectedId===el.id?' selected':'');
+    let desc;
+    if (el.type==='lens') desc = `Lens · f=${el.f}cm · x=${el.x.toFixed(1)}cm`;
+    else if (el.type==='mirror') desc = `Mirror · f=${el.f}cm · x=${el.x.toFixed(1)}cm`;
+    else if (el.type==='planeMirror') desc = `Plane mirror · x=${el.x.toFixed(1)}cm`;
+    else if (el.type==='prism') desc = `Prism · A=${el.A}° n=${el.n} · x=${el.x.toFixed(1)}cm`;
+    else desc = `Slab · t=${el.thickness}cm n=${el.n} · x=${el.x.toFixed(1)}cm`;
+    row.innerHTML = `<span>${desc}</span><button>Remove</button>`;
+    row.querySelector('button').addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      benchState.elements = benchState.elements.filter(e=>e.id!==el.id);
+      if (benchState.selectedId===el.id) benchState.selectedId = null;
+      renderBenchList(); renderBenchEditor(); renderScene();
+    });
+    row.addEventListener('click', ()=>{ benchState.selectedId = el.id; renderBenchList(); renderBenchEditor(); renderScene(); });
+    wrap.appendChild(row);
+  });
+}
+
+function renderBenchEditor(){
+  const card = document.getElementById('benchEditorCard');
+  const wrap = document.getElementById('benchEditor');
+  const el = benchState.elements.find(e=>e.id===benchState.selectedId);
+  if (!el){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  wrap.innerHTML = '';
+
+  const fields = [];
+  fields.push({ key:'x', label:'Position (x)', min:0.5, max:BENCH_LENGTH, step:0.5, value:el.x, suffix:' cm' });
+  if (el.type === 'lens' || el.type === 'mirror'){
+    fields.push({ key:'f', label:'Focal length (f)', min:-100, max:100, step:1, value:el.f, suffix:' cm' });
+  } else if (el.type === 'slab'){
+    fields.push({ key:'thickness', label:'Thickness (t)', min:1, max:30, step:0.5, value:el.thickness, suffix:' cm' });
+    fields.push({ key:'n', label:'Refractive index (n)', min:1.05, max:2.5, step:0.01, value:el.n, suffix:'' });
+  } else if (el.type === 'prism'){
+    fields.push({ key:'A', label:'Apex angle (A)', min:10, max:120, step:1, value:el.A, suffix:' °' });
+    fields.push({ key:'n', label:'Refractive index (n)', min:1.05, max:2.5, step:0.01, value:el.n, suffix:'' });
+    fields.push({ key:'i1', label:'Angle of incidence (i₁)', min:0, max:89, step:1, value:el.i1, suffix:' °' });
+    fields.push({ key:'size', label:'Drawn size', min:0.5, max:2.5, step:0.1, value:el.size||1, suffix:'×' });
+  }
+
+  fields.forEach(f=>{
+    buildControlRow(wrap, f, f.value, (v)=>{
+      el[f.key] = v;
+      renderBenchList();
+      renderScene();
+    });
+  });
+
+  if (el.type === 'prism'){
+    const note = document.createElement('p');
+    note.style.cssText = 'margin:4px 0 12px;color:var(--muted);font-size:11.5px;line-height:1.5';
+    note.textContent = "A prism deviates the ray by an angle — it doesn't focus to a point, so it's shown for reference and doesn't feed into the lens/mirror image-distance chain.";
+    wrap.appendChild(note);
+  }
+
+  const delRow = document.createElement('button');
+  delRow.className = 'mini-btn danger';
+  delRow.textContent = 'Remove this element';
+  delRow.style.marginTop = '4px';
+  delRow.addEventListener('click', ()=>{
+    benchState.elements = benchState.elements.filter(e=>e.id!==el.id);
+    benchState.selectedId = null;
+    renderBenchList(); renderBenchEditor(); renderScene();
+  });
+  wrap.appendChild(delRow);
+}
+</script>
+</body>
+</html>
